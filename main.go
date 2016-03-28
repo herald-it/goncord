@@ -1,18 +1,28 @@
 package main
 
 import (
-	"fmt"
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+
+	"github.com/herald-it/goncord/controllers"
+	"github.com/herald-it/goncord/utils"
+
+	"github.com/julienschmidt/httprouter"
+	"gopkg.in/mgo.v2"
 )
 
-func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	fmt.Fprint(w, "Welcome!\n")
+func getSession() *mgo.Session {
+	set := utils.GetSettingInstance()
+	s, err := mgo.Dial(set.Database["host"])
+	utils.LogError(err)
+
+	return s
 }
 
 func main() {
+	uc := controllers.NewUserController(getSession())
+
 	var router = httprouter.New()
-	router.GET("/", index)
-	log.Fatal(http.ListenAndServe(":8000", router))
+	router.POST("/register", uc.RegisterUser)
+	log.Fatal(http.ListenAndServe(":8228", router))
 }
