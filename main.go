@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"github.com/herald-it/goncord/controllers"
 	"github.com/herald-it/goncord/utils"
+
+	"log"
+	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
@@ -17,6 +17,7 @@ func getSession() *mgo.Session {
 	utils.LogError(err)
 
 	return s
+	return nil
 }
 
 func main() {
