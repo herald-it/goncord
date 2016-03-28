@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/hex"
+	"fmt"
 	"net/http"
 
 	"github.com/herald-it/goncord/models"
@@ -10,7 +11,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	//"gopkg.in/mgo.v2/bson"
 )
 
 type UserController struct {
@@ -26,27 +27,24 @@ func (uc UserController) RegisterUser(
 	r *http.Request,
 	ps httprouter.Params) {
 
-	login := r.PostFormValue("login")
-	password := r.PostFormValue("password")
-	email := r.PostFormValue("email")
-
-	tmp_u := models.User{}
-	collect := uc.session.DB("auth_service").C("users")
-	n, err := collect.Find(bson.M{"$or": [...]bson.M{bson.M{"login": login}, bson.M{"email": email}}}).Count()
+	err := r.ParseForm()
 	utils.LogError(err)
 
-	if n != 0 {
-		w.Write([]byte("User is already exist!"))
-		return
-	}
+	usr := new(models.User)
+	utils.Fill(usr, r.PostForm)
 
-	tmp_u = models.User{
-		Login:    login,
-		Password: hex.EncodeToString(pwd_hash.Sum([]byte(password))),
-		Email:    email,
-	}
+	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	collect.Insert(&tmp_u)
+	// collect := uc.session.DB("auth_service").C("users")
+	// n, err := collect.Find(bson.M{"$or": [...]bson.M{bson.M{"login": login}, bson.M{"email": email}}}).Count()
+	// utils.LogError(err)
 
+	// if n != 0 {
+	// 	w.Write([]byte("User is already exist!"))
+	// 	return
+	// }
+
+	// collect.Insert(&usr)
+	fmt.Println(usr)
 	w.Write([]byte("Succesfully added!"))
 }
