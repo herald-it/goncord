@@ -1,12 +1,11 @@
 package controllers
 
 import (
-	"crypto/md5"
-	"crypto/sha1"
 	"encoding/hex"
 	"net/http"
 
 	"github.com/herald-it/goncord/models"
+	"github.com/herald-it/goncord/pwd_hash"
 	"github.com/herald-it/goncord/utils"
 
 	"github.com/julienschmidt/httprouter"
@@ -41,16 +40,9 @@ func (uc UserController) RegisterUser(
 		return
 	}
 
-	hasher_sha1 := sha1.New()
-	_, err = hasher_sha1.Write([]byte(password))
-	utils.LogError(err)
-
-	hasher_md5 := md5.New()
-	_, err = hasher_md5.Write(hasher_sha1.Sum(nil))
-
 	tmp_u = models.User{
 		Login:    login,
-		Password: hex.EncodeToString(hasher_md5.Sum(nil)),
+		Password: hex.EncodeToString(pwd_hash.Sum([]byte(password))),
 		Email:    email,
 	}
 
