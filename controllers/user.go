@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/hex"
-	"fmt"
 	"net/http"
 
 	"github.com/herald-it/goncord/models"
@@ -11,11 +10,16 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
 )
+
+const collect = uc.GetDB().C("users")
 
 type UserController struct {
 	session *mgo.Session
+}
+
+func (uc UserController) GetDB() *mgo.Database {
+	return uc.session.DB("auth_service")
 }
 
 func NewUserController(s *mgo.Session) *UserController {
@@ -30,21 +34,29 @@ func (uc UserController) RegisterUser(
 	err := r.ParseForm()
 	utils.LogError(err)
 
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	}
+
 	usr := new(models.User)
 	utils.Fill(usr, r.PostForm)
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	// collect := uc.session.DB("auth_service").C("users")
-	// n, err := collect.Find(bson.M{"$or": [...]bson.M{bson.M{"login": login}, bson.M{"email": email}}}).Count()
-	// utils.LogError(err)
+	n, err := usr.Find(collect).Count()
+	utils.LogError(err)
 
-	// if n != 0 {
-	// 	w.Write([]byte("User is already exist!"))
-	// 	return
-	// }
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 
-	// collect.Insert(&usr)
-	fmt.Println(usr)
-	w.Write([]byte("Succesfully added!"))
+	if n != 0 {
+		http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable)
+		w.Write([]byte("User already exist"))
+		return
+	}
+
+	collect.Insert(&usr)
+	w.Write([]byte("Succesfully added"))
 }
