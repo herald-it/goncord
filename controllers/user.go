@@ -12,8 +12,6 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
-const collect = uc.GetDB().C("users")
-
 type UserController struct {
 	session *mgo.Session
 }
@@ -26,10 +24,18 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
+func (uc UserController) LoginUser(
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Param) {
+}
+
 func (uc UserController) RegisterUser(
 	w http.ResponseWriter,
 	r *http.Request,
 	ps httprouter.Params) {
+
+	collect := uc.GetDB().C("users")
 
 	err := r.ParseForm()
 	utils.LogError(err)
