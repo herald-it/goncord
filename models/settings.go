@@ -1,5 +1,7 @@
 package models
 
 type Setting struct {
-	Database map[string]string
+	Database struct {
+		Host string
+	}
 }
