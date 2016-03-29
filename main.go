@@ -13,11 +13,10 @@ import (
 
 func getSession() *mgo.Session {
 	set := utils.GetSettingInstance()
-	s, err := mgo.Dial(set.Database["host"])
+	s, err := mgo.Dial(set.Database.Host)
 	utils.LogError(err)
 
 	return s
-	return nil
 }
 
 func main() {
