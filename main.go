@@ -24,5 +24,6 @@ func main() {
 
 	var router = httprouter.New()
 	router.POST("/register", uc.RegisterUser)
+	router.POST("/login", uc.LoginUser)
 	log.Fatal(http.ListenAndServe(":8228", router))
 }
