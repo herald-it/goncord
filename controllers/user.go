@@ -95,6 +95,14 @@ func (uc UserController) LoginUser(
 
 	err = token.Method.Verify(strings.Join(strings.Split(raw_token_strng, ".")[0:2], "."), sign, rsa_pub_key)
 	utils.LogError(err)
+
+	cookie_jwt := raw_token_strng + "." + sign
+	http.SetCookie(w, &http.Cookie{
+		Name:     "jwt",
+		Value:    cookie_jwt,
+		HttpOnly: true})
+
+	w.Write([]byte("Token succesfully added."))
 }
 
 func (uc UserController) RegisterUser(
