@@ -85,7 +85,6 @@ func (uc UserController) LoginUser(
 
 	token.Method = jwt.GetSigningMethod("RS256")
 
-	//base_token, _ := token.SigningString(pub_key)
 	raw_token_strng, _ := token.SigningString()
 	log.Print("Raw token: " + raw_token_strng)
 
@@ -96,15 +95,6 @@ func (uc UserController) LoginUser(
 
 	err = token.Method.Verify(strings.Join(strings.Split(raw_token_strng, ".")[0:2], "."), sign, rsa_pub_key)
 	utils.LogError(err)
-	//m := jwt.GetSigningMethod("RS256")
-	//m.Sign(signingString, key)
-
-	// arr := strings.Split(base_token, ".")
-
-	// for _, e := range arr {
-	// 	src, _ := base64.StdEncoding.DecodeString(e)
-	// 	log.Print(string(src))
-	// }
 }
 
 func (uc UserController) RegisterUser(
