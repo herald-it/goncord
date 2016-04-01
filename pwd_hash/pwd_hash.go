@@ -32,7 +32,7 @@ func (d *digest) BlockSize() int {
 }
 
 func (d *digest) Sum(b []byte) []byte {
-	return Sum(b)
+	return Sum(d.bytes)
 }
 
 // Implement writer interface
