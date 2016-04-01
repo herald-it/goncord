@@ -6,6 +6,6 @@ package utils
 // logError(err)
 func LogError(err error) {
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 }
