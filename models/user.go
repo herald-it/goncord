@@ -16,13 +16,26 @@ func (u User) String() string {
 	return fmt.Sprintf("Login: %v\tPassword: %v\tEmail: %v\n", u.Login, u.Password, u.Email)
 }
 
-func (u User) Find(c *mgo.Collection) *mgo.Query {
+func (u *User) Find(c *mgo.Collection) *mgo.Query {
 	find_user_query := `$or: [
         {"login": %v},
         {"email": %v}
     ]`
 
 	query := fmt.Sprintf(find_user_query, u.Login, u.Email)
+	collect := c.Find(query)
+
+	return collect
+}
+
+func (u *User) FindWithPwd(c *mgo.Collection) *mgo.Query {
+	find_user_query := `$or: [
+        {"login": %v},
+        {"email": %v},
+        {"password": %v}
+    ]`
+
+	query := fmt.Sprintf(find_user_query, u.Login, u.Email, u.Password)
 	collect := c.Find(query)
 
 	return collect
