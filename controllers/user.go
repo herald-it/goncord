@@ -1,19 +1,15 @@
 package controllers
 
 import (
-	//"encoding/base64"
 	"encoding/hex"
-	"io/ioutil"
-	"log"
 	"net/http"
-	"strings"
-	"time"
 
+	"github.com/herald-it/goncord/keygen"
 	"github.com/herald-it/goncord/models"
 	"github.com/herald-it/goncord/pwd_hash"
+	"github.com/herald-it/goncord/querying"
 	"github.com/herald-it/goncord/utils"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
 )
@@ -30,6 +26,14 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
+// Save user and token to table token_dump.
+func (uc UserController) dumpUser(usr *models.User, token string) error {
+	dump_token := models.NewDumpToken(usr, token)
+	err := uc.GetDB().C("token_dump").Insert(&dump_token)
+
+	return err
+}
+
 func (uc UserController) LoginUser(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -42,6 +46,7 @@ func (uc UserController) LoginUser(
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
 	}
 
 	usr := new(models.User)
@@ -49,58 +54,31 @@ func (uc UserController) LoginUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	n, err := usr.FindWithPwd(collect).Count()
+	user_exist, err := querying.Find(usr, collect)
 	utils.LogError(err)
 
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if user_exist == nil {
+		http.Error(w, http.StatusText(http.StatusPreconditionFailed), http.StatusPreconditionFailed)
 		return
 	}
 
-	if n != 1 {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		w.Write([]byte("User not found!"))
-		return
-	}
-
-	file_pub_key, err := ioutil.ReadFile("public.key")
-	utils.LogError(err)
-	rsa_pub_key, err := jwt.ParseRSAPublicKeyFromPEM(file_pub_key)
-	_ = rsa_pub_key
+	key_pair, err := keygen.NewKeyPair()
 	utils.LogError(err)
 
-	file_pri_key, err := ioutil.ReadFile("private.key")
-	utils.LogError(err)
-	rsa_pri_key, err := jwt.ParseRSAPrivateKeyFromPEM(file_pri_key)
-	_ = rsa_pri_key
+	token, err := user_exist.NewToken(key_pair.Private)
 	utils.LogError(err)
 
-	token := jwt.New(jwt.SigningMethodRS256)
-	token.Claims["email"] = usr.Email
-	token.Claims["login"] = usr.Login
-	token.Claims["iat"] = time.Now().Unix()
-
-	log.Print(token.Header)
-	log.Print(token.Claims)
-
-	token.Method = jwt.GetSigningMethod("RS256")
-
-	raw_token_strng, _ := token.SigningString()
-	log.Print("Raw token: " + raw_token_strng)
-
-	sign, err := token.Method.Sign(raw_token_strng, rsa_pri_key)
-	utils.LogError(err)
-
-	log.Print("Sign: " + sign)
-
-	err = token.Method.Verify(strings.Join(strings.Split(raw_token_strng, ".")[0:2], "."), sign, rsa_pub_key)
-	utils.LogError(err)
-
-	cookie_jwt := raw_token_strng + "." + sign
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt",
-		Value:    cookie_jwt,
-		HttpOnly: true})
+		Value:    token,
+		HttpOnly: true,
+		Secure:   true})
+
+	err := uc.dumpUser(user_exist, token)
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+		return
+	}
 
 	w.Write([]byte("Token succesfully added."))
 }
@@ -124,15 +102,13 @@ func (uc UserController) RegisterUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	n, err := usr.Find(collect).Count()
-	utils.LogError(err)
-
+	user_exist, err := querying.IsExist(usr, collect)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
 
-	if n == 1 {
+	if user_exist {
 		http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable)
 		w.Write([]byte("User already exist"))
 		return
