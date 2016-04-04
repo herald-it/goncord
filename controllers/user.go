@@ -46,6 +46,7 @@ func (uc UserController) LoginUser(
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		w.Write([]byte("Post form can not be parsed."))
 		return
 	}
 
@@ -54,11 +55,12 @@ func (uc UserController) LoginUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	user_exist, err := querying.Find(usr, collect)
+	user_exist, err := querying.FindUser(usr, collect)
 	utils.LogError(err)
 
 	if user_exist == nil {
 		http.Error(w, http.StatusText(http.StatusPreconditionFailed), http.StatusPreconditionFailed)
+		w.Write([]byte("User does not exist."))
 		return
 	}
 
@@ -74,9 +76,10 @@ func (uc UserController) LoginUser(
 		HttpOnly: true,
 		Secure:   true})
 
-	err := uc.dumpUser(user_exist, token)
+	err = uc.dumpUser(user_exist, token)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
+		w.Write([]byte("Token can not be dump."))
 		return
 	}
 
@@ -95,6 +98,8 @@ func (uc UserController) RegisterUser(
 
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		w.Write([]byte("Post form can not be parsed."))
+		return
 	}
 
 	usr := new(models.User)
@@ -102,11 +107,8 @@ func (uc UserController) RegisterUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	user_exist, err := querying.IsExist(usr, collect)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-		return
-	}
+	user_exist, err := querying.IsExistUser(usr, collect)
+	utils.LogError(err)
 
 	if user_exist {
 		http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable)
