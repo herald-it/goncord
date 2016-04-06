@@ -36,7 +36,9 @@ func (sc ServiceController) IsValid(
 	}
 
 	token := new(models.DumpToken)
-	Fill(token, r.PostForm)
+	if err := Fill(token, r.PostForm); err != nil {
+		return &HttpError{err, "Post form is not consistent with structure.", 500}
+	}
 
 	if token.Token == "" {
 		return &HttpError{nil, "Invalid token value.", 500}
