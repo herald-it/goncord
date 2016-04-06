@@ -5,8 +5,11 @@ import (
 	"net/url"
 )
 
-func Fill(i interface{}, form url.Values) {
+func Fill(i interface{}, form url.Values) error {
 	decoder := schema.NewDecoder()
-	err := decoder.Decode(i, form)
-	LogError(err)
+	if err := decoder.Decode(i, form); err != nil {
+		return err
+	}
+
+	return nil
 }
