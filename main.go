@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/herald-it/goncord/controllers"
-	"github.com/herald-it/goncord/utils"
+	. "github.com/herald-it/goncord/utils"
 
 	"log"
 	"net/http"
@@ -12,18 +12,21 @@ import (
 )
 
 func getSession() *mgo.Session {
-	set := utils.GetSettingInstance()
+	set := GetSettingInstance()
 	s, err := mgo.Dial(set.Database.Host)
-	utils.LogError(err)
+	LogError(err)
 
 	return s
 }
 
 func main() {
 	uc := controllers.NewUserController(getSession())
+	us := controllers.NewServiceController(getSession())
 
 	var router = httprouter.New()
-	router.POST("/register", uc.RegisterUser)
-	router.POST("/login", uc.LoginUser)
+	router.POST("/register", ErrWrap(uc.RegisterUser))
+	router.POST("/login", ErrWrap(uc.LoginUser))
+	router.POST("/validate", ErrWrap(us.IsValid))
+
 	log.Fatal(http.ListenAndServe(":8228", router))
 }
