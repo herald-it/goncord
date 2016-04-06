@@ -8,7 +8,7 @@ import (
 	"github.com/herald-it/goncord/models"
 	"github.com/herald-it/goncord/pwd_hash"
 	"github.com/herald-it/goncord/querying"
-	"github.com/herald-it/goncord/utils"
+	. "github.com/herald-it/goncord/utils"
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
@@ -37,85 +37,75 @@ func (uc UserController) dumpUser(usr *models.User, token string) error {
 func (uc UserController) LoginUser(
 	w http.ResponseWriter,
 	r *http.Request,
-	ps httprouter.Params) {
+	ps httprouter.Params) *HttpError {
 
 	collect := uc.GetDB().C("users")
 
-	err := r.ParseForm()
-	utils.LogError(err)
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		w.Write([]byte("Post form can not be parsed."))
-		return
+	if err := r.ParseForm(); err != nil {
+		return &HttpError{err, "Post form can not be parsed.", 500}
 	}
 
 	usr := new(models.User)
-	utils.Fill(usr, r.PostForm)
+	if err := Fill(usr, r.PostForm); err != nil {
+		return &HttpError{err, "Post form is not consistent with structure.", 500}
+	}
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	user_exist, err := querying.FindUser(usr, collect)
-	utils.LogError(err)
 
-	if user_exist == nil {
-		http.Error(w, http.StatusText(http.StatusPreconditionFailed), http.StatusPreconditionFailed)
-		w.Write([]byte("User does not exist."))
-		return
+	if user_exist == nil || err != nil {
+		return &HttpError{err, "User not exist.", 500}
 	}
 
 	key_pair, err := keygen.NewKeyPair()
-	utils.LogError(err)
+	if err != nil {
+		return &HttpError{err, "New key pair error.", 500}
+	}
 
 	token, err := user_exist.NewToken(key_pair.Private)
-	utils.LogError(err)
+	if err != nil {
+		return &HttpError{err, "New token error.", 500}
+	}
 
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt",
 		Value:    token,
 		HttpOnly: true,
-		Secure:   true})
+		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
 
-	err = uc.dumpUser(user_exist, token)
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusConflict), http.StatusConflict)
-		w.Write([]byte("Token can not be dump."))
-		return
+	if err = uc.dumpUser(user_exist, token); err != nil {
+		return &HttpError{err, "Token can not be dumped.", 500}
 	}
 
 	w.Write([]byte("Token succesfully added."))
+	return nil
 }
 
 func (uc UserController) RegisterUser(
 	w http.ResponseWriter,
 	r *http.Request,
-	ps httprouter.Params) {
+	ps httprouter.Params) *HttpError {
 
 	collect := uc.GetDB().C("users")
 
-	err := r.ParseForm()
-	utils.LogError(err)
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		w.Write([]byte("Post form can not be parsed."))
-		return
+	if err := r.ParseForm(); err != nil {
+		return &HttpError{err, "Post form can not be parsed.", 500}
 	}
 
 	usr := new(models.User)
-	utils.Fill(usr, r.PostForm)
+	if err := Fill(usr, r.PostForm); err != nil {
+		return &HttpError{err, "Post form is not consistent with structure.", 500}
+	}
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	user_exist, err := querying.IsExistUser(usr, collect)
-	utils.LogError(err)
-
-	if user_exist {
-		http.Error(w, http.StatusText(http.StatusNotAcceptable), http.StatusNotAcceptable)
-		w.Write([]byte("User already exist"))
-		return
+	is_user_exist, err := querying.IsExistUser(usr, collect)
+	if is_user_exist || err != nil {
+		return &HttpError{err, "User already exist.", 500}
 	}
 
 	collect.Insert(&usr)
 	w.Write([]byte("Succesfully added"))
+	return nil
 }
