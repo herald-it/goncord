@@ -3,7 +3,7 @@ package pwd_hash_test
 import (
 	"crypto/md5"
 	"crypto/sha1"
-	"github.com/herald-it/goncord/pwd_hash"
+	"github.com/herald-it/goncord/utils/pwd_hash"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )

@@ -4,11 +4,11 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	"github.com/herald-it/goncord/keygen"
 	"github.com/herald-it/goncord/models"
-	"github.com/herald-it/goncord/pwd_hash"
-	"github.com/herald-it/goncord/querying"
 	. "github.com/herald-it/goncord/utils"
+	"github.com/herald-it/goncord/utils/keygen"
+	"github.com/herald-it/goncord/utils/pwd_hash"
+	"github.com/herald-it/goncord/utils/querying"
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"

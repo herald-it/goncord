@@ -10,8 +10,8 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/herald-it/goncord/models"
-	"github.com/herald-it/goncord/querying"
 	. "github.com/herald-it/goncord/utils"
+	"github.com/herald-it/goncord/utils/querying"
 )
 
 type ServiceController struct {

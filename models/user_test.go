@@ -2,8 +2,8 @@ package models_test
 
 import (
 	"encoding/json"
-	"github.com/herald-it/goncord/keygen"
 	"github.com/herald-it/goncord/models"
+	"github.com/herald-it/goncord/utils/keygen"
 	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
