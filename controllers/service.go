@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
+	"github.com/dgrijalva/jwt-go"
 	"net/http"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
@@ -47,6 +49,15 @@ func (sc ServiceController) IsValid(
 	find_dump_token, err := querying.FindDumpToken(token, collect)
 	if err != nil || find_dump_token == nil {
 		return &HttpError{err, "Token not found.", 500}
+	}
+
+	token_pars, err := jwt.Parse(find_dump_token.Token, nil)
+	life_time := token_pars.Claims["iat"]
+
+	time_span := time.Now().Unix() - int64(life_time.(float64))
+	if time_span > (7 * 24 * 60 * 60) {
+		collect.Remove(find_dump_token)
+		return &HttpError{nil, "Time token life has expired.", 500}
 	}
 
 	usr := new(models.User)
