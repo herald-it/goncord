@@ -3,15 +3,16 @@ package models_test
 import (
 	"encoding/json"
 	"github.com/herald-it/goncord/models"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
 func TestNewDumpTokenModel(t *testing.T) {
 	dump_token := &models.DumpToken{}
 
-	if dump_token == nil {
-		t.Fatal("Nil pointer after create new dump token")
-	}
+	Convey("Create new dump token", t, func() {
+		So(dump_token, ShouldNotBeNil)
+	})
 }
 
 func TestJsonDumpTokenModel(t *testing.T) {
@@ -21,11 +22,11 @@ func TestJsonDumpTokenModel(t *testing.T) {
 	const str = `{"token":"my_secret_token"}`
 	b, e := json.Marshal(&dump_token)
 
-	if e != nil {
-		t.Fatalf("Error: %v", e.Error())
-	}
+	Convey("Marshal struct to json", t, func() {
+		So(e, ShouldBeNil)
+	})
 
-	if string(b) != str {
-		t.Fatalf("%v not equal %v", string(b), str)
-	}
+	Convey("Test correct jsonify", t, func() {
+		So(string(b), ShouldEqual, str)
+	})
 }
