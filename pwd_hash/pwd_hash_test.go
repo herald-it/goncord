@@ -4,52 +4,52 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"github.com/herald-it/goncord/pwd_hash"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
 const pwd = "my_super_crypto_password"
 
 func TestCorrectHashFunc(t *testing.T) {
-	sha1_sum := sha1.Sum([]byte(pwd))
-	vanilla_sum := md5.Sum(sha1_sum[:])
-	vanilla_sum_slice := vanilla_sum[:]
+	Convey("Test correct hash func", t, func() {
+		sha1_sum := sha1.Sum([]byte(pwd))
+		vanilla_sum := md5.Sum(sha1_sum[:])
+		vanilla_sum_slice := vanilla_sum[:]
 
-	my_pwd_hash := pwd_hash.Sum([]byte(pwd))
+		my_pwd_hash := pwd_hash.Sum([]byte(pwd))
 
-	if string(vanilla_sum_slice) != string(my_pwd_hash) {
-		t.Errorf("Original hash sum not equal. \norigin:  %v\ncurrent: %v",
-			string(vanilla_sum_slice), string(my_pwd_hash))
-	}
+		Convey("Equal self hash and original hash", func() {
+			So(string(vanilla_sum_slice), ShouldEqual, string(my_pwd_hash))
+		})
 
-	hash := pwd_hash.New()
-	hash.Write([]byte(pwd))
+		hash := pwd_hash.New()
+		hash.Write([]byte(pwd))
 
-	hash_sum := hash.Sum(nil)
-	if string(hash_sum) != string(vanilla_sum_slice) {
-		t.Error("Not equal")
-	}
+		Convey("Test hash sum method", func() {
+			hash_sum := hash.Sum(nil)
+			So(string(hash_sum), ShouldEqual, string(vanilla_sum_slice))
+		})
+	})
 }
 
 func TestCorrectWriteFunc(t *testing.T) {
-	sha1_sum := sha1.Sum([]byte(pwd))
-	vanilla_sum := md5.Sum(sha1_sum[:])
-	vanilla_sum_slice := vanilla_sum[:]
+	Convey("test correct write function", t, func() {
+		sha1_sum := sha1.Sum([]byte(pwd))
+		vanilla_sum := md5.Sum(sha1_sum[:])
+		vanilla_sum_slice := vanilla_sum[:]
 
-	hash := pwd_hash.New()
-	hash.Write([]byte(pwd))
+		hash := pwd_hash.New()
+		hash.Write([]byte(pwd))
 
-	hash_sum := hash.Sum(nil)
-	if string(hash_sum) != string(vanilla_sum_slice) {
-		t.Error("Not equal")
-	}
+		hash_sum := hash.Sum(nil)
+
+		So(string(hash_sum), ShouldEqual, string(vanilla_sum_slice))
+	})
 }
 
 func TestCorrectData(t *testing.T) {
-	if pwd_hash.Size != 16 {
-		t.Error("Size not equal")
-	}
-
-	if pwd_hash.BlockSize != 64 {
-		t.Error("Block size")
-	}
+	Convey("Test constant data", t, func() {
+		So(pwd_hash.Size, ShouldEqual, 16)
+		So(pwd_hash.BlockSize, ShouldEqual, 64)
+	})
 }
