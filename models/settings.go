@@ -19,10 +19,15 @@ type Setting struct {
 
 var Set Setting
 
-func LoadSettings() {
+func LoadSettings() error {
 	text, err := ioutil.ReadFile("./settings.yml")
-	utils.LogError(err)
+	if err != nil {
+		return err
+	}
 
-	err = yaml.Unmarshal(text, &Set)
-	utils.LogError(err)
+	if err = yaml.Unmarshal(text, &Set); err != nil {
+		return err
+	}
+
+	return nil
 }
