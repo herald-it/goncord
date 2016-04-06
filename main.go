@@ -21,11 +21,13 @@ func getSession() *mgo.Session {
 	return s
 }
 
-func main() {
+func init() {
 	if err := models.LoadSettings(); err != nil {
 		panic(err)
 	}
+}
 
+func main() {
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
