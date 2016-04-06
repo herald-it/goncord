@@ -19,7 +19,7 @@ type UserController struct {
 }
 
 func (uc UserController) GetDB() *mgo.Database {
-	return uc.session.DB("auth_service")
+	return uc.session.DB(models.Set.Database.DbName)
 }
 
 func NewUserController(s *mgo.Session) *UserController {
@@ -29,7 +29,7 @@ func NewUserController(s *mgo.Session) *UserController {
 // Save user and token to table token_dump.
 func (uc UserController) dumpUser(usr *models.User, token string) error {
 	dump_token := models.NewDumpToken(usr, token)
-	err := uc.GetDB().C("token_dump").Insert(&dump_token)
+	err := uc.GetDB().C(models.Set.Database.TokenTable).Insert(&dump_token)
 
 	return err
 }
@@ -39,7 +39,7 @@ func (uc UserController) LoginUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C("users")
+	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{err, "Post form can not be parsed.", 500}
@@ -87,7 +87,7 @@ func (uc UserController) RegisterUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C("users")
+	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{err, "Post form can not be parsed.", 500}
