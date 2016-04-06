@@ -4,55 +4,60 @@ import (
 	"encoding/json"
 	"github.com/herald-it/goncord/keygen"
 	"github.com/herald-it/goncord/models"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
 func TestNewUserModel(t *testing.T) {
-	usr := &models.User{
-		Login:    "tl",
-		Password: "tp",
-		Email:    "te"}
+	Convey("Create new user", t, func() {
+		usr := &models.User{
+			Login:    "tl",
+			Password: "tp",
+			Email:    "te"}
 
-	if usr == nil {
-		t.Fatal("Nil pointer after create new user.")
-	}
+		So(usr, ShouldNotBeNil)
+	})
 }
 
 func TestJsonUserModel(t *testing.T) {
-	usr := models.User{
-		Login:    "log",
-		Password: "pwd",
-		Email:    "ema"}
+	Convey("Model to json format", t, func() {
+		usr := models.User{
+			Login:    "log",
+			Password: "pwd",
+			Email:    "ema"}
 
-	const str = `{"login":"log","password":"pwd","email":"ema"}`
-	b, e := json.Marshal(&usr)
+		const str = `{"login":"log","password":"pwd","email":"ema"}`
+		b, e := json.Marshal(&usr)
 
-	if e != nil {
-		t.Fatalf("Error: %v", e.Error())
-	}
+		Convey("Marshal struct to json", func() {
+			So(e, ShouldBeNil)
+		})
 
-	if string(b) != str {
-		t.Fatalf("%v not equal %v", string(b), str)
-	}
+		Convey("Test correct jsonify", func() {
+			So(string(b), ShouldEqual, str)
+		})
+	})
 }
 
 func TestNewTokenMethod(t *testing.T) {
-	usr := models.User{
-		Login:    "log",
-		Password: "pwd",
-		Email:    "ema"}
+	Convey("Test new token", t, func() {
+		usr := models.User{
+			Login:    "log",
+			Password: "pwd",
+			Email:    "ema"}
 
-	rsa_key, err := keygen.NewKeyPair()
-	if err != nil {
-		t.Fatalf("%v", err.Error())
-	}
+		rsa_key, err := keygen.NewKeyPair()
 
-	token, err := usr.NewToken(rsa_key.Private)
-	if err != nil {
-		t.Fatalf("%v", err.Error())
-	}
+		Convey("New key pair", func() {
+			So(err, ShouldBeNil)
+			So(rsa_key, ShouldNotBeNil)
+		})
 
-	if token == "" {
-		t.Fatalf("Empty token: %v", token)
-	}
+		token, err := usr.NewToken(rsa_key.Private)
+		Convey("Create new user token", func() {
+			So(err, ShouldBeNil)
+			So(token, ShouldNotBeNil)
+			So(token, ShouldNotEqual, "")
+		})
+	})
 }
