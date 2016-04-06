@@ -14,7 +14,9 @@ import (
 
 func getSession() *mgo.Session {
 	s, err := mgo.Dial(models.Set.Database.Host)
-	LogError(err)
+	if err != nil {
+		panic(err)
+	}
 
 	return s
 }
