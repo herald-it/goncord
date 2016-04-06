@@ -1,10 +1,7 @@
 package models
 
 import (
-	"github.com/herald-it/goncord/utils"
-
 	"gopkg.in/yaml.v2"
-
 	"io/ioutil"
 )
 

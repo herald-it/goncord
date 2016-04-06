@@ -53,8 +53,8 @@ func TestNewTokenMethod(t *testing.T) {
 			So(rsa_key, ShouldNotBeNil)
 		})
 
-		token, err := usr.NewToken(rsa_key.Private)
 		Convey("Create new user token", func() {
+			token, err := usr.NewToken(rsa_key.Private)
 			So(err, ShouldBeNil)
 			So(token, ShouldNotBeNil)
 			So(token, ShouldNotEqual, "")

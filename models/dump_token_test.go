@@ -9,8 +9,17 @@ import (
 
 func TestNewDumpTokenModel(t *testing.T) {
 	Convey("Create new dump token", t, func() {
-		dump_token := &models.DumpToken{}
-		So(dump_token, ShouldNotBeNil)
+		Convey("Create new dump token without constructor", func() {
+			dump_token := &models.DumpToken{}
+			So(dump_token, ShouldNotBeNil)
+
+		})
+
+		Convey("Create new dump token constructor", func() {
+			usr := models.User{}
+			dump_token := models.NewDumpToken(&usr, "token")
+			So(dump_token.Token, ShouldEqual, "token")
+		})
 	})
 }
 
