@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/herald-it/goncord/controllers"
+	"github.com/herald-it/goncord/models"
 	. "github.com/herald-it/goncord/utils"
 
 	"log"
@@ -12,14 +13,15 @@ import (
 )
 
 func getSession() *mgo.Session {
-	set := GetSettingInstance()
-	s, err := mgo.Dial(set.Database.Host)
+	s, err := mgo.Dial(models.Set.Database.Host)
 	LogError(err)
 
 	return s
 }
 
 func main() {
+	models.LoadSettings()
+
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
