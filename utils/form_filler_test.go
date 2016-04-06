@@ -2,6 +2,7 @@ package utils_test
 
 import (
 	"github.com/herald-it/goncord/utils"
+	. "github.com/smartystreets/goconvey/convey"
 	"net/url"
 	"testing"
 )
@@ -12,21 +13,20 @@ type TestStruct struct {
 }
 
 func TestFormFiller(t *testing.T) {
-	ts := new(TestStruct)
-	form := url.Values{}
-	form.Set("Field", "form_field")
-	form.Set("Field2", "1")
+	Convey("Test form filler method", t, func() {
+		ts := new(TestStruct)
+		form := url.Values{}
+		form.Set("Field", "form_field")
+		form.Set("Field2", "1")
+		err := utils.Fill(ts, form)
 
-	err := utils.Fill(ts, form)
-	if err != nil {
-		t.Fatalf("Fill form return err: %v", err.Error())
-	}
+		Convey("Fill structure from form", func() {
+			So(err, ShouldBeNil)
+		})
 
-	if ts.Field != "form_field" {
-		t.Fatalf("%v not equal test value: %v", ts.Field, form.Get("Field"))
-	}
-
-	if ts.Field2 != 1 {
-		t.Fatalf("%v not equal test value: %v", ts.Field2, form.Get("Field2"))
-	}
+		Convey("Correct parse form", func() {
+			So(ts.Field, ShouldEqual, "form_field")
+			So(ts.Field2, ShouldEqual, 1)
+		})
+	})
 }
