@@ -43,13 +43,3 @@ func FindDumpToken(obj *DumpToken, c *mgo.Collection) (*DumpToken, error) {
 
 	return &results[0], nil
 }
-
-func IsExistDumpToken(obj *DumpToken, c *mgo.Collection) (bool, error) {
-	dump_token, err := FindDumpToken(obj, c)
-	return dump_token != nil && err == nil, err
-}
-
-func IsExistUser(obj *User, c *mgo.Collection) (bool, error) {
-	usr, err := FindUser(obj, c)
-	return usr != nil && err == nil, err
-}
