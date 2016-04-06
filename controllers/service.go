@@ -17,7 +17,7 @@ type ServiceController struct {
 }
 
 func (sc ServiceController) GetDB() *mgo.Database {
-	return sc.session.DB("auth_service")
+	return sc.session.DB(models.Set.Database.DbName)
 }
 
 func NewServiceController(s *mgo.Session) *ServiceController {
@@ -29,7 +29,7 @@ func (sc ServiceController) IsValid(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := sc.GetDB().C("token_dump")
+	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{err, "Post form can not be parsed.", 500}
@@ -52,7 +52,7 @@ func (sc ServiceController) IsValid(
 	usr := new(models.User)
 	usr.Id = find_dump_token.UserId
 
-	find_usr, err := querying.FindUser(usr, sc.GetDB().C("users"))
+	find_usr, err := querying.FindUser(usr, sc.GetDB().C(models.Set.Database.UserTable))
 	if err != nil {
 		return &HttpError{err, "User not found.", 500}
 	}
