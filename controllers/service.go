@@ -9,7 +9,7 @@ import (
 
 	"github.com/herald-it/goncord/models"
 	"github.com/herald-it/goncord/querying"
-	"github.com/herald-it/goncord/utils"
+	. "github.com/herald-it/goncord/utils"
 )
 
 type ServiceController struct {
@@ -27,31 +27,24 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 func (sc ServiceController) IsValid(
 	w http.ResponseWriter,
 	r *http.Request,
-	ps httprouter.Params) {
+	ps httprouter.Params) *HttpError {
 
 	collect := sc.GetDB().C("token_dump")
 
-	err := r.ParseForm()
-	utils.LogError(err)
-
-	if err != nil {
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		w.Write([]byte("Post form can not be parsed."))
-		return
+	if err := r.ParseForm(); err != nil {
+		return &HttpError{err, "Post form can not be parsed.", 500}
 	}
 
 	token := new(models.DumpToken)
-	utils.Fill(token, r.PostForm)
+	Fill(token, r.PostForm)
 
 	if token.Token == "" {
-		w.Write([]byte("Invalid token value."))
-		return
+		return &HttpError{nil, "Invalid token value.", 500}
 	}
 
 	find_dump_token, err := querying.FindDumpToken(token, collect)
-	if err != nil {
-		w.Write([]byte("Token not found."))
-		return
+	if err != nil || find_dump_token == nil {
+		return &HttpError{err, "Token not found.", 500}
 	}
 
 	usr := new(models.User)
@@ -59,14 +52,14 @@ func (sc ServiceController) IsValid(
 
 	find_usr, err := querying.FindUser(usr, sc.GetDB().C("users"))
 	if err != nil {
-		w.Write([]byte("User not found."))
-		return
+		return &HttpError{err, "User not found.", 500}
 	}
 
 	json_usr, err := json.Marshal(find_usr)
 	if err != nil {
-		w.Write([]byte("User can not convert to json."))
+		return &HttpError{err, "User can not convert to json.", 500}
 	}
 
 	w.Write(json_usr)
+	return nil
 }
