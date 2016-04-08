@@ -32,9 +32,9 @@ func main() {
 	us := controllers.NewServiceController(getSession())
 
 	var router = httprouter.New()
-	router.POST("/register", ErrWrap(uc.RegisterUser))
-	router.POST("/login", ErrWrap(uc.LoginUser))
-	router.POST("/validate", ErrWrap(us.IsValid))
+	router.POST(models.Set.Router.Register, ErrWrap(uc.RegisterUser))
+	router.POST(models.Set.Router.Login, ErrWrap(uc.LoginUser))
+	router.POST(models.Set.Router.Validate, ErrWrap(us.IsValid))
 
 	log.Fatal(http.ListenAndServeTLS(
 		":8228",
