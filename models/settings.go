@@ -14,7 +14,7 @@ type Setting struct {
 	}
 	Ssl struct {
 		Key         string
-		Sertificate string
+		Certificate string
 	}
 	Router struct {
 		Register string
