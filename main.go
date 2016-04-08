@@ -36,5 +36,9 @@ func main() {
 	router.POST("/login", ErrWrap(uc.LoginUser))
 	router.POST("/validate", ErrWrap(us.IsValid))
 
-	log.Fatal(http.ListenAndServe(":8228", router))
+	log.Fatal(http.ListenAndServeTLS(
+		":8228",
+		models.Set.Ssl.Sertificate,
+		models.Set.Ssl.Key,
+		router))
 }
