@@ -72,7 +72,7 @@ func (uc UserController) LoginUser(
 		Name:     "jwt",
 		Value:    token,
 		HttpOnly: true,
-		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
+		Secure:   true}) // TODO: HTTPS. Если true то токена не видно.
 
 	if err = uc.dumpUser(user_exist, token); err != nil {
 		return &HttpError{err, "Token can not be dumped.", 500}

@@ -1,0 +1,17 @@
+version: "2"
+
+services:
+  auth:
+    build: .
+    links:
+      - db
+    ports:
+      - "10001:10001"
+  db:
+    image: mvertes/alpine-mongo:latest
+    volumes:
+      - data:/var/lib/mongodb
+
+volumes:
+  data:
+    driver: local
