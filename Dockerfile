@@ -1,9 +1,10 @@
-FROM kiasaki/alpine-golang
+FROM alpine:latest
 
-ADD settings.yml $GOPATH/bin/settings.yml
-WORKDIR $GOPATH/bin
-RUN go get github.com/herald-it/goncord
+WORKDIR /app
+
+ADD settings.yml settings.yml
+ADD ./build/goncord .
 
 EXPOSE 10001
 
-CMD ["goncord"]
+CMD ["./goncord"]
