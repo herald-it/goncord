@@ -1,10 +1,8 @@
-FROM ubuntu:latest
+FROM kiasaki/alpine-golang
 
-WORKDIR /auth-service
-
-ADD auth-service /auth-service
-ADD settings.yml /auth-service
+ADD settings.yml $GOPATH/bin/settings.yml
+RUN go get github.com/herald-it/goncord
 
 EXPOSE 10001
 
-CMD ["./auth-service"]
+CMD ["goncord"]
