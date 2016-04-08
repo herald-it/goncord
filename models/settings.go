@@ -12,6 +12,15 @@ type Setting struct {
 		TokenTable string
 		UserTable  string
 	}
+	Ssl struct {
+		Key         string
+		Sertificate string
+	}
+	Router struct {
+		Register string
+		Login    string
+		Validate string
+	}
 }
 
 var Set Setting
