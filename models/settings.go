@@ -21,6 +21,7 @@ type Setting struct {
 		Login    string
 		Validate string
 	}
+	Ip string
 }
 
 var Set Setting
