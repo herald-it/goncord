@@ -1,4 +1,4 @@
-1package main
+package main
 
 import (
 	"github.com/herald-it/goncord/controllers"
@@ -35,9 +35,12 @@ func main() {
 	router.POST(models.Set.Router.Register, ErrWrap(uc.RegisterUser))
 	router.POST(models.Set.Router.Login, ErrWrap(uc.LoginUser))
 	router.POST(models.Set.Router.Validate, ErrWrap(us.IsValid))
+	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		w.Write([]byte("Service authorization"))
+	})
 
 	log.Fatal(http.ListenAndServeTLS(
-		":8228",
+		models.Set.Ip,
 		models.Set.Ssl.Certificate,
 		models.Set.Ssl.Key,
 		router))
