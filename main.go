@@ -1,4 +1,4 @@
-package main
+1package main
 
 import (
 	"github.com/herald-it/goncord/controllers"
@@ -38,7 +38,7 @@ func main() {
 
 	log.Fatal(http.ListenAndServeTLS(
 		":8228",
-		models.Set.Ssl.Sertificate,
+		models.Set.Ssl.Certificate,
 		models.Set.Ssl.Key,
 		router))
 }
