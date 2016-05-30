@@ -28,8 +28,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Starting...")
-
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
@@ -41,7 +39,9 @@ func main() {
 		w.Write([]byte("Service authorization"))
 	})
 
-	log.Fatal(http.ListenAndServe(
+	log.Fatal(http.ListenAndServeTLS(
 		models.Set.Ip,
+		models.Set.Ssl.Certificate,
+		models.Set.Ssl.Key,
 		router))
 }

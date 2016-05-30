@@ -1,10 +1,10 @@
 version: "2"
 
 services:
-  builder:
-    build: ./builder
-    volumes:
-      - "./build:/gopath/bin/"
+#  builder:
+#    build: ./builder
+#    volumes:
+#      - "./build:/gopath/bin/"
   auth:
     build: .
     links:
