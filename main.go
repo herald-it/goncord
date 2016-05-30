@@ -39,9 +39,7 @@ func main() {
 		w.Write([]byte("Service authorization"))
 	})
 
-	log.Fatal(http.ListenAndServeTLS(
-		models.Set.Ip,
-		models.Set.Ssl.Certificate,
-		models.Set.Ssl.Key,
-		router))
+	if err := http.ListenAndServe(models.Set.Ip, router); err != nil {
+		panic(err)
+	}
 }
