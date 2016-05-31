@@ -5,6 +5,6 @@ WORKDIR /app
 ADD settings.yml settings.yml
 ADD ./build/goncord .
 
-EXPOSE 10001
+EXPOSE 8000
 
 CMD ["./goncord"]
