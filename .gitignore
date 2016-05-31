@@ -30,3 +30,7 @@ settings.yml
 build
 build/
 build/*
+
+debug
+launc.json
+.vscode
