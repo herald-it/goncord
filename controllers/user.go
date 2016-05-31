@@ -101,8 +101,12 @@ func (uc UserController) RegisterUser(
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	isUserExist, err := querying.IsExistUser(usr, collect)
-	if isUserExist || err != nil {
-		return &HttpError{err, "User already exist.", 500}
+	if err != nil {
+		return &HttpError{err, "Error check user exist.", 500}
+	}
+
+	if isUserExist {
+		return &HttpError{nil, "User already exist.", 500}
 	}
 
 	collect.Insert(&usr)
