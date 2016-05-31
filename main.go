@@ -5,7 +5,6 @@ import (
 	"github.com/herald-it/goncord/models"
 	. "github.com/herald-it/goncord/utils"
 
-	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
