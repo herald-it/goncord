@@ -52,9 +52,9 @@ func (uc UserController) LoginUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	user_exist, err := querying.FindUser(usr, collect)
+	userExist, err := querying.FindUser(usr, collect)
 
-	if user_exist == nil || err != nil {
+	if userExist == nil || err != nil {
 		return &HttpError{err, "User not exist.", 500}
 	}
 
@@ -63,7 +63,7 @@ func (uc UserController) LoginUser(
 		return &HttpError{err, "New key pair error.", 500}
 	}
 
-	token, err := user_exist.NewToken(key_pair.Private)
+	token, err := userExist.NewToken(key_pair.Private)
 	if err != nil {
 		return &HttpError{err, "New token error.", 500}
 	}
@@ -71,10 +71,10 @@ func (uc UserController) LoginUser(
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt",
 		Value:    token,
-		HttpOnly: true,
-		Secure:   true}) // TODO: HTTPS. Если true то токена не видно.
+		HttpOnly: false,
+		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
 
-	if err = uc.dumpUser(user_exist, token); err != nil {
+	if err = uc.dumpUser(userExist, token); err != nil {
 		return &HttpError{err, "Token can not be dumped.", 500}
 	}
 
@@ -100,8 +100,8 @@ func (uc UserController) RegisterUser(
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
-	is_user_exist, err := querying.IsExistUser(usr, collect)
-	if is_user_exist || err != nil {
+	isUserExist, err := querying.IsExistUser(usr, collect)
+	if isUserExist || err != nil {
 		return &HttpError{err, "User already exist.", 500}
 	}
 
