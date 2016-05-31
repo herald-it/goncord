@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/herald-it/goncord/controllers"
 	"github.com/herald-it/goncord/models"
 	. "github.com/herald-it/goncord/utils"
@@ -27,6 +29,8 @@ func init() {
 }
 
 func main() {
+	log.Println("Start auth gate")
+
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
