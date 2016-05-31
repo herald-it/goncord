@@ -10,7 +10,7 @@ services:
     links:
       - db
     ports:
-      - "10000:8000"
+      - "8000:10000"
   db:
     image: mvertes/alpine-mongo:latest
     volumes:
