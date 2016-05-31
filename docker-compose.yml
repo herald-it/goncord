@@ -1,16 +1,16 @@
 version: "2"
 
 services:
-#  builder:
-#    build: ./builder
-#    volumes:
-#      - "./build:/gopath/bin/"
+  builder:
+    build: ./builder
+    volumes:
+      - "./build:/gopath/bin/"
   auth:
     build: .
     links:
       - db
     ports:
-      - "10001:10001"
+      - "10000:8000"
   db:
     image: mvertes/alpine-mongo:latest
     volumes:
