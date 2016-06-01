@@ -9,13 +9,11 @@ services:
     build: .
     links:
       - db
+    depends_on:
+      - builder
     ports:
-      - "8000:10000"
+      - "8000:8000"
   db:
     image: mvertes/alpine-mongo:latest
     volumes:
-      - data:/var/lib/mongodb
-
-volumes:
-  data:
-    driver: local
+      - /data/db:/data/db
