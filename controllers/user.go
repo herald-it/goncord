@@ -71,6 +71,7 @@ func (uc UserController) LoginUser(
 	http.SetCookie(w, &http.Cookie{
 		Name:     "jwt",
 		Value:    token,
+		Domain:   ".dissw.ru",
 		HttpOnly: false,
 		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
 
