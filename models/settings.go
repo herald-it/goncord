@@ -22,6 +22,7 @@ type Setting struct {
 		Login    string
 		Validate string
 	}
+	Domain string
 	Ip string
 }
 
