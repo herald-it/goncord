@@ -69,6 +69,7 @@ func (sc ServiceController) IsValid(
 		return &HttpError{err, "User not found.", 500}
 	}
 
+	findUsr.Password = findUsr.Password[:5] + "..."
 	jsonUsr, err := json.Marshal(findUsr)
 	if err != nil {
 		return &HttpError{err, "User can not convert to json.", 500}

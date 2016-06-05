@@ -95,6 +95,7 @@ func (uc UserController) LoginUser(
 	w.Write([]byte("Token succesfully added."))
 
 	log.Println("Token added: ", token)
+	usr.Password = usr.Password[:5] + "..."
 	log.Println("For user: ", usr)
 	return nil
 }
