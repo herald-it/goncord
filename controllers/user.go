@@ -141,6 +141,7 @@ func (uc UserController) RegisterUser(
 	collect.Insert(&usr)
 	w.Write([]byte("Succesfully added"))
 
+	usr.Password = usr.Password[:5] + "..."
 	log.Println("User added: ", usr)
 	return nil
 }
