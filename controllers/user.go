@@ -26,14 +26,27 @@ func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }
 
-// Save user and token to table token_dump.
+// dumpUser save user and token to table token_dump.
 func (uc UserController) dumpUser(usr *models.User, token string) error {
-	dump_token := models.NewDumpToken(usr, token)
-	err := uc.GetDB().C(models.Set.Database.TokenTable).Insert(&dump_token)
+	dumpToken := models.NewDumpToken(usr, token)
+	err := uc.GetDB().C(models.Set.Database.TokenTable).Insert(&dumpToken)
 
 	return err
 }
 
+// LoginUser user authorization.
+// Authorization information is obtained from
+// form post. In order to log in
+// post the form should contain fields such as:
+// 	login
+// 	password
+// 	email
+// If authentication is successful, the user in the cookie
+// will add the jwt token. Cook's name will be the jwt and the value
+// the issued token.
+// The token lifetime is 7 days. After the expiration of
+// the lifetime of the token, the authorization process need
+// pass again.
 func (uc UserController) LoginUser(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -82,6 +95,17 @@ func (uc UserController) LoginUser(
 	return nil
 }
 
+// RegisterUser registration of the user.
+// Details for registration are obtained from
+// form post.
+// For registration must be post
+// the form contained fields such as:
+// 	login
+// 	password
+// 	email
+// After registration the token is not issued.
+// To retrieve the token you need to pass the operation
+// a login.
 func (uc UserController) RegisterUser(
 	w http.ResponseWriter,
 	r *http.Request,
