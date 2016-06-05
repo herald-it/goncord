@@ -23,7 +23,7 @@ type Setting struct {
 		Validate string
 	}
 	Domain string
-	Ip string
+	IP     string
 }
 
 var Set Setting
