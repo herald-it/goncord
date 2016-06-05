@@ -2,14 +2,20 @@ package querying
 
 import (
 	"errors"
+
 	. "github.com/herald-it/goncord/models"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
-	err := c.Find(obj).All(&results)
+	err := c.Find(
+		bson.M{"$or": []bson.M{
+			bson.M{"login": obj.Login},
+			bson.M{"email": obj.Password},
+		}}).All(&results)
 	if err != nil {
 		return nil, err
 	}
