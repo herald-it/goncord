@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/hex"
+	"log"
 	"net/http"
 
 	"github.com/herald-it/goncord/models"
@@ -92,6 +93,9 @@ func (uc UserController) LoginUser(
 	}
 
 	w.Write([]byte("Token succesfully added."))
+
+	log.Println("Token added: ", token)
+	log.Println("For user: ", usr)
 	return nil
 }
 
@@ -135,5 +139,7 @@ func (uc UserController) RegisterUser(
 
 	collect.Insert(&usr)
 	w.Write([]byte("Succesfully added"))
+
+	log.Println("User added: ", usr)
 	return nil
 }
