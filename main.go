@@ -42,7 +42,7 @@ func main() {
 		w.Write([]byte("Service authorization"))
 	})
 
-	if err := http.ListenAndServe(models.Set.Ip, router); err != nil {
+	if err := http.ListenAndServe(models.Set.IP, router); err != nil {
 		panic(err)
 	}
 }
