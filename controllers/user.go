@@ -53,17 +53,16 @@ func (uc UserController) LoginUser(
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	userExist, err := querying.FindUser(usr, collect)
-
 	if userExist == nil || err != nil {
 		return &HttpError{err, "User not exist.", 500}
 	}
 
-	key_pair, err := keygen.NewKeyPair()
+	keyPair, err := keygen.NewKeyPair()
 	if err != nil {
 		return &HttpError{err, "New key pair error.", 500}
 	}
 
-	token, err := userExist.NewToken(key_pair.Private)
+	token, err := userExist.NewToken(keyPair.Private)
 	if err != nil {
 		return &HttpError{err, "New token error.", 500}
 	}
@@ -72,7 +71,7 @@ func (uc UserController) LoginUser(
 		Name:     "jwt",
 		Value:    token,
 		Domain:   models.Set.Domain,
-		HttpOnly: false,
+		HttpOnly: true,
 		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
 
 	if err = uc.dumpUser(userExist, token); err != nil {
