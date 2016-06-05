@@ -27,6 +27,11 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 	return &ServiceController{s}
 }
 
+// IsValid Check the token for validity.
+// The token can be a cookie or transferred
+// post the form. First we checked the cookies.
+// If the token is valid, the response will contain
+// user model in json format.
 func (sc ServiceController) IsValid(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -35,18 +40,11 @@ func (sc ServiceController) IsValid(
 	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 	token := &models.DumpToken{}
 
-	jwtCookie, cookieErr := r.Cookie("jwt")
-	if cookieErr != nil {
-		if err := r.ParseForm(); err != nil {
-			return &HttpError{err, "Post form can not be parsed.", 500}
-		}
-
-		if err := Fill(token, r.PostForm); err != nil {
-			return &HttpError{err, "Post form is not consistent with structure.", 500}
-		}
-	} else {
-		token.Token = jwtCookie.Value
+	tokenTmp, httpErr := getToken(r)
+	if httpErr != nil {
+		return httpErr
 	}
+	token.Token = tokenTmp
 
 	if token.Token == "" {
 		return &HttpError{nil, "Invalid token value.", 500}
@@ -57,11 +55,8 @@ func (sc ServiceController) IsValid(
 		return &HttpError{err, "Token not found.", 500}
 	}
 
-	tokenPars, err := jwt.Parse(findDumpToken.Token, nil)
-	lifeTime := tokenPars.Claims["iat"]
-
-	timeSpan := time.Now().Unix() - int64(lifeTime.(float64))
-	if timeSpan > (7 * 24 * 60 * 60) {
+	tokenParse, err := jwt.Parse(findDumpToken.Token, nil)
+	if checkLifeTime(tokenParse) {
 		collect.Remove(findDumpToken)
 		return &HttpError{nil, "Time token life has expired.", 500}
 	}
@@ -81,4 +76,30 @@ func (sc ServiceController) IsValid(
 
 	w.Write(jsonUsr)
 	return nil
+}
+
+// getToken returns the token from the cookie,
+// if the cookie is not present in the token, then looking in
+// post the form if the token is not exist, then returned
+// an empty string and error code.
+func getToken(r *http.Request) (string, *HttpError) {
+	jwtCookie, err := r.Cookie("jwt")
+	if err != nil {
+		if err := r.ParseForm(); err != nil {
+			return "", &HttpError{err, "Post form can not be parsed.", 500}
+		}
+
+		token := r.PostForm.Get("jwt")
+		return token, nil
+	}
+
+	return jwtCookie.Value, nil
+}
+
+// checkLifeTime checks the token lifetime.
+func checkLifeTime(token *jwt.Token) bool {
+	lifeTime := token.Claims["iat"]
+	timeSpan := time.Now().Unix() - int64(lifeTime.(float64))
+
+	return timeSpan > (7 * 24 * 60 * 60)
 }
