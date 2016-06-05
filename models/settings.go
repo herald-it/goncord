@@ -28,8 +28,8 @@ type Setting struct {
 
 var Set Setting
 
-func LoadSettings() error {
-	text, err := ioutil.ReadFile("settings.yml")
+func LoadSettings(path string) error {
+	text, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}

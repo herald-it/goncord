@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/herald-it/goncord/controllers"
@@ -13,6 +14,10 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+var (
+	settingPath = flag.String("s", "./settings.yml", "setting file path")
+)
+
 func getSession() *mgo.Session {
 	s, err := mgo.Dial(models.Set.Database.Host)
 	if err != nil {
@@ -23,7 +28,9 @@ func getSession() *mgo.Session {
 }
 
 func init() {
-	if err := models.LoadSettings(); err != nil {
+	flag.Parse()
+
+	if err := models.LoadSettings(*settingPath); err != nil {
 		panic(err)
 	}
 }
