@@ -6,8 +6,8 @@ import (
 )
 
 func IsExistDumpToken(obj *DumpToken, c *mgo.Collection) (bool, error) {
-	dump_token, err := FindDumpToken(obj, c)
-	return dump_token != nil && err == nil, err
+	dumpToken, err := FindDumpToken(obj, c)
+	return dumpToken != nil && err == nil, err
 }
 
 func IsExistUser(obj *User, c *mgo.Collection) (bool, error) {

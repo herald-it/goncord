@@ -16,13 +16,13 @@ func (k keyPair) String() string {
 }
 
 func NewKeyPair() (*keyPair, error) {
-	priv_key, err := rsa.GenerateKey(rand.Reader, 2048)
+	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return nil, err
 	}
 
-	priv_key.Precompute()
+	privKey.Precompute()
 
-	pub_key := &priv_key.PublicKey
-	return &keyPair{Private: priv_key, Public: pub_key}, nil
+	pubKey := &privKey.PublicKey
+	return &keyPair{Private: privKey, Public: pubKey}, nil
 }
