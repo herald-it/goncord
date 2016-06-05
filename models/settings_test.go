@@ -9,7 +9,7 @@ import (
 
 func TestLoadSettings(t *testing.T) {
 	Convey("Load settings from test", t, func() {
-		err := models.LoadSettings()
+		err := models.LoadSettings("./settings.yml")
 
 		So(err, ShouldBeNil)
 		So(models.Set.Database, ShouldNotBeNil)
