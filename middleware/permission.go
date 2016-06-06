@@ -57,6 +57,10 @@ func CheckPermission(next Handle) Handle {
 }
 
 func contains(s string, arr []string) bool {
+	if len(arr) == 0 {
+		return true
+	}
+
 	for _, v := range arr {
 		if v == s {
 			return true
