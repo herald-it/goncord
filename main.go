@@ -62,6 +62,10 @@ func main() {
 		models.Set.Router.Logout.Path,
 		coll.Wrap(ErrWrap(us.Logout)),
 	)
+	router.POST(
+		models.Set.Router.Update.Path,
+		coll.Wrap(ErrWrap(uc.UpdateUser)),
+	)
 
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, p Params) {
 		w.Write([]byte("Service authorization"))
