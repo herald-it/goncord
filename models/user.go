@@ -11,11 +11,10 @@ import (
 
 // User model.
 type User struct {
-	Id                  bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty" schema:"-"`
-	Login               string        `json:"login" bson:"login,omitempty" scheme:"login"`
-	Password            string        `json:"password" bson:"password,omitempty" scheme:"password"`
-	Email               string        `json:"email" bson:"email,omitempty" scheme:"email"`
-	Csrfmiddlewaretoken string        `scheme:"csrfmiddlewaretoken"`
+	Id       bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty" schema:"-"`
+	Login    string        `json:"login" bson:"login,omitempty" scheme:"login"`
+	Password string        `json:"password" bson:"password,omitempty" scheme:"password"`
+	Email    string        `json:"email" bson:"email,omitempty" scheme:"email"`
 }
 
 // Implement stringer
