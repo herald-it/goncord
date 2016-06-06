@@ -36,19 +36,23 @@ func init() {
 }
 
 func main() {
-	log.Println("Start auth gate")
+	log.Println("Start initialize...")
 
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
 	var router = httprouter.New()
+
 	router.POST(models.Set.Router.Register, ErrWrap(uc.RegisterUser))
 	router.POST(models.Set.Router.Login, ErrWrap(uc.LoginUser))
 	router.POST(models.Set.Router.Validate, ErrWrap(us.IsValid))
+	router.POST(models.Set.Router.Logout, ErrWrap(us.Logout))
+
 	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		w.Write([]byte("Service authorization"))
 	})
 
+	log.Println("Start auth gate!")
 	if err := http.ListenAndServe(models.Set.IP, router); err != nil {
 		panic(err)
 	}

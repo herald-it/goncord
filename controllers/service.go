@@ -27,6 +27,32 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 	return &ServiceController{s}
 }
 
+func (sc ServiceController) Logout(
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Params) *HttpError {
+
+	collect := sc.GetDB().C(models.Set.Database.TokenTable)
+	token := models.DumpToken{}
+
+	tokenTmp, httpErr := getToken(r)
+	if httpErr != nil {
+		return httpErr
+	}
+	token.Token = tokenTmp
+
+	if token.Token == "" {
+		return &HttpError{nil, "Invalid token value.", 500}
+	}
+
+	if err := collect.Remove(token); err != nil {
+		return &HttpError{err, "Delete token error.", 500}
+	}
+
+	w.Write([]byte("The token was successfully deleted."))
+	return nil
+}
+
 // IsValid Check the token for validity.
 // The token can be a cookie or transferred
 // post the form. First we checked the cookies.
