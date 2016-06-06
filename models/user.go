@@ -11,7 +11,7 @@ import (
 
 // User model.
 type User struct {
-	Id       bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
+	ID       bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
 	Login    string        `json:"login" bson:"login,omitempty"`
 	Password string        `json:"password" bson:"password,omitempty"`
 	Email    string        `json:"email" bson:"email,omitempty"`
@@ -20,7 +20,7 @@ type User struct {
 
 // Implement stringer
 func (u User) String() string {
-	return fmt.Sprintf("Id: %v\tLogin: %v\tPassword: %v\tEmail: %v\nPayload: %v", u.Id, u.Login, u.Password, u.Email, u.Payload)
+	return fmt.Sprintf("Id: %v\tLogin: %v\tPassword: %v\tEmail: %v\nPayload: %v", u.ID, u.Login, u.Password, u.Email, u.Payload)
 }
 
 // NewToken creates a new token using private key.

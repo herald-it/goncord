@@ -14,7 +14,7 @@ import (
 func FindUserID(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
-	err := c.FindId(obj.Id).All(&results)
+	err := c.FindId(obj.ID).All(&results)
 	if err != nil {
 		return nil, err
 	}

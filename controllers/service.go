@@ -91,7 +91,7 @@ func (sc ServiceController) IsValid(
 	}
 
 	usr := new(models.User)
-	usr.Id = findDumpToken.UserId
+	usr.ID = findDumpToken.UserId
 
 	findUsr, err := querying.FindUserID(usr, sc.GetDB().C(models.Set.Database.UserTable))
 	if err != nil {

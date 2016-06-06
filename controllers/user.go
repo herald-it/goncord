@@ -169,7 +169,7 @@ func (uc UserController) UpdateUser(
 		return &HttpError{err, "Error unmarshal json to user model.", 500}
 	}
 
-	if err := collect.UpdateId(usr.Id, usr); err != nil {
+	if err := collect.UpdateId(usr.ID, usr); err != nil {
 		return &HttpError{err, "Error updating user model.", 500}
 	}
 

@@ -13,7 +13,7 @@ type DumpToken struct {
 // Associating a user id with a token.
 func NewDumpToken(u *User, token string) DumpToken {
 	return DumpToken{
-		UserId: u.Id,
+		UserId: u.ID,
 		Token:  token,
 	}
 }
