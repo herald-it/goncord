@@ -148,6 +148,12 @@ func (uc UserController) RegisterUser(
 	return nil
 }
 
+// UpdateUser update fields in the user model.
+// Update data are taken from form post.
+// Form post parameter "user".
+// In order that you could update
+// model is required _id field.
+// Value field is a json user object.
 func (uc UserController) UpdateUser(
 	w http.ResponseWriter,
 	r *http.Request,
