@@ -11,10 +11,7 @@ import (
 func FindUserID(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
-	err := c.Find(
-		bson.M{"$or": []bson.M{
-			bson.M{"_id": obj.Id},
-		}}).All(&results)
+	err := c.FindId(obj.Id).All(&results)
 	if err != nil {
 		return nil, err
 	}
