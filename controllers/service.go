@@ -27,7 +27,6 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 	return &ServiceController{s}
 }
 
-
 // Logout removes the current token from
 // the database. The next validation
 // the user is not authorized.
@@ -99,7 +98,6 @@ func (sc ServiceController) IsValid(
 		return &HttpError{err, "User not found.", 500}
 	}
 
-	findUsr.Password = findUsr.Password[:5] + "..."
 	jsonUsr, err := json.Marshal(findUsr)
 	if err != nil {
 		return &HttpError{err, "User can not convert to json.", 500}
