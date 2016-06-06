@@ -53,9 +53,6 @@ func (uc UserController) LoginUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	log.Println("Host: ", r.Host)
-	log.Println("Remote: ", r.RemoteAddr)
-
 	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
