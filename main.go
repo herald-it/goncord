@@ -10,7 +10,8 @@ import (
 
 	"net/http"
 
-	"github.com/julienschmidt/httprouter"
+	"github.com/herald-it/goncord/middleware"
+	. "github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
 )
 
@@ -41,14 +42,28 @@ func main() {
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
 
-	var router = httprouter.New()
+	coll := middleware.MidCollect{}
+	coll = coll.Add(middleware.CheckPermission)
 
-	router.POST(models.Set.Router.Register, ErrWrap(uc.RegisterUser))
-	router.POST(models.Set.Router.Login, ErrWrap(uc.LoginUser))
-	router.POST(models.Set.Router.Validate, ErrWrap(us.IsValid))
-	router.POST(models.Set.Router.Logout, ErrWrap(us.Logout))
+	router := New()
+	router.POST(
+		models.Set.Router.Register.Path,
+		coll.Wrap(ErrWrap(uc.RegisterUser)),
+	)
+	router.POST(
+		models.Set.Router.Login.Path,
+		coll.Wrap(ErrWrap(uc.LoginUser)),
+	)
+	router.POST(
+		models.Set.Router.Validate.Path,
+		coll.Wrap(ErrWrap(us.IsValid)),
+	)
+	router.POST(
+		models.Set.Router.Logout.Path,
+		coll.Wrap(ErrWrap(us.Logout)),
+	)
 
-	router.GET("/", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	router.GET("/", func(w http.ResponseWriter, r *http.Request, p Params) {
 		w.Write([]byte("Service authorization"))
 	})
 
