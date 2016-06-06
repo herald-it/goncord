@@ -27,8 +27,10 @@ type Setting struct {
 	IP     string
 }
 
+// Set the set of loaded settings.
 var Set Setting
 
+// LoadSettings loads the settings from a file.
 func LoadSettings(path string) error {
 	text, err := ioutil.ReadFile(path)
 	if err != nil {

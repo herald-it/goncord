@@ -8,6 +8,9 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// FindUserID looking for a user in the collection.
+// If the ID was found was more than 1
+// user returns an error.
 func FindUserID(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
@@ -27,6 +30,8 @@ func FindUserID(obj *User, c *mgo.Collection) (*User, error) {
 	return &results[0], nil
 }
 
+// FindUser searches for the user in the collection.
+// If found more than 1 user returns an error.
 func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
@@ -50,6 +55,8 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	return &results[0], nil
 }
 
+// FindDumpToken searches the token in the collection.
+// If found more than 1 token returns an error.
 func FindDumpToken(obj *DumpToken, c *mgo.Collection) (*DumpToken, error) {
 	var results []DumpToken
 

@@ -9,7 +9,8 @@ type DumpToken struct {
 	Token  string        `json:"token" bson:"token"`
 }
 
-// Create new dump token struct.
+// NewDumpToken create new dump token struct.
+// Associating a user id with a token.
 func NewDumpToken(u *User, token string) DumpToken {
 	return DumpToken{
 		UserId: u.Id,
