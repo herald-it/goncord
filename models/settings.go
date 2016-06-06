@@ -21,6 +21,7 @@ type Setting struct {
 		Register string
 		Login    string
 		Validate string
+		Logout   string
 	}
 	Domain string
 	IP     string
