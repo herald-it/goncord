@@ -90,7 +90,7 @@ func (sc ServiceController) IsValid(
 	usr := new(models.User)
 	usr.Id = findDumpToken.UserId
 
-	findUsr, err := querying.FindUser(usr, sc.GetDB().C(models.Set.Database.UserTable))
+	findUsr, err := querying.FindUserID(usr, sc.GetDB().C(models.Set.Database.UserTable))
 	if err != nil {
 		return &HttpError{err, "User not found.", 500}
 	}
