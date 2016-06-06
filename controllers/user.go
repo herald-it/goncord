@@ -63,7 +63,7 @@ func (uc UserController) LoginUser(
 	}
 
 	usr := new(models.User)
-	if err := Fill(usr, r.PostForm, "login", "email", "password"); err != nil {
+	if err := Fill(usr, r.PostForm, "login|email", "password"); err != nil {
 		return &HttpError{err, "Error fill form. Not all fields are specified.", 500}
 	}
 
