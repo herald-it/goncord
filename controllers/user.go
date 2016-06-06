@@ -60,8 +60,8 @@ func (uc UserController) LoginUser(
 	}
 
 	usr := new(models.User)
-	if err := Fill(usr, r.PostForm); err != nil {
-		return &HttpError{err, "Post form is not consistent with structure.", 500}
+	if err := Fill(usr, r.PostForm, "login", "email", "password"); err != nil {
+		return &HttpError{err, "Error fill form. Not all fields are specified.", 500}
 	}
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
@@ -123,8 +123,8 @@ func (uc UserController) RegisterUser(
 	}
 
 	usr := new(models.User)
-	if err := Fill(usr, r.PostForm); err != nil {
-		return &HttpError{err, "Post form is not consistent with structure.", 500}
+	if err := Fill(usr, r.PostForm, "login", "email", "password"); err != nil {
+		return &HttpError{err, "Error fill form. Not all fields are specified.", 500}
 	}
 
 	if usr.Login == "" || usr.Email == "" || usr.Password == "" {
@@ -143,7 +143,6 @@ func (uc UserController) RegisterUser(
 	}
 
 	collect.Insert(&usr)
-	w.Write([]byte("Succesfully added"))
 
 	usr.Password = usr.Password[:5] + "..."
 	log.Println("User added: ", usr)
