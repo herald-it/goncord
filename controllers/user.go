@@ -127,6 +127,10 @@ func (uc UserController) RegisterUser(
 		return &HttpError{err, "Post form is not consistent with structure.", 500}
 	}
 
+	if usr.Login == "" || usr.Email == "" || usr.Password == "" {
+		return &HttpError{nil, "All required fields were not filled.", 500}
+	}
+
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	isUserExist, err := querying.IsExistUser(usr, collect)
