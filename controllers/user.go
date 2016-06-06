@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"log"
 	"net/http"
 
@@ -144,5 +145,33 @@ func (uc UserController) RegisterUser(
 
 	usr.Password = usr.Password[:5] + "..."
 	log.Println("User added: ", usr)
+	return nil
+}
+
+func (uc UserController) UpdateUser(
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Params) *HttpError {
+
+	collect := uc.GetDB().C(models.Set.Database.UserTable)
+
+	if err := r.ParseForm(); err != nil {
+		return &HttpError{err, "Post form can not be parsed.", 500}
+	}
+
+	updUsrText := r.PostFormValue("user")
+	if updUsrText == "" {
+		return &HttpError{nil, "Empty update user form.", 500}
+	}
+
+	usr := new(models.User)
+	if err := json.Unmarshal([]byte(updUsrText), usr); err != nil {
+		return &HttpError{err, "Error unmarshal json to user model.", 500}
+	}
+
+	if err := collect.UpdateId(usr.Id, usr); err != nil {
+		return &HttpError{err, "Error updating user model.", 500}
+	}
+
 	return nil
 }
