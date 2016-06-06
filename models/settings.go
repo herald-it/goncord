@@ -27,6 +27,7 @@ type Setting struct {
 		Login    Router
 		Validate Router
 		Logout   Router
+		Update   Router
 	}
 	Domain string
 	IP     string
