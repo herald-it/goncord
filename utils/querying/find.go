@@ -36,7 +36,7 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	err := c.Find(
 		bson.M{"$or": []bson.M{
 			bson.M{"login": obj.Login},
-			bson.M{"email": obj.Password},
+			bson.M{"email": obj.Email},
 		}}).All(&results)
 	if err != nil {
 		return nil, err
