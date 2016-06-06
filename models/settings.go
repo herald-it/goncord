@@ -6,6 +6,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type Router struct {
+	Path        string
+	AllowedHost []string
+}
+
 type Setting struct {
 	Database struct {
 		Host       string
@@ -18,10 +23,10 @@ type Setting struct {
 		Certificate string
 	}
 	Router struct {
-		Register string
-		Login    string
-		Validate string
-		Logout   string
+		Register Router
+		Login    Router
+		Validate Router
+		Logout   Router
 	}
 	Domain string
 	IP     string
