@@ -53,6 +53,9 @@ func (uc UserController) LoginUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
+	log.Println("Host: ", r.Host)
+	log.Println("Remote: ", r.RemoteAddr)
+
 	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
@@ -91,8 +94,6 @@ func (uc UserController) LoginUser(
 	if err = uc.dumpUser(userExist, token); err != nil {
 		return &HttpError{err, "Token can not be dumped.", 500}
 	}
-
-	w.Write([]byte("Token succesfully added."))
 
 	log.Println("Token added: ", token)
 	usr.Password = usr.Password[:5] + "..."
