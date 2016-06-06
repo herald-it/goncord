@@ -15,11 +15,12 @@ type User struct {
 	Login    string        `json:"login" bson:"login,omitempty"`
 	Password string        `json:"password" bson:"password,omitempty"`
 	Email    string        `json:"email" bson:"email,omitempty"`
+	Payload  string        `json:"payload,omitempty" bson:"payload,omitempty"`
 }
 
 // Implement stringer
 func (u User) String() string {
-	return fmt.Sprintf("Id: %v\tLogin: %v\tPassword: %v\tEmail: %v\n", u.Id, u.Login, u.Password, u.Email)
+	return fmt.Sprintf("Id: %v\tLogin: %v\tPassword: %v\tEmail: %v\nPayload: %v", u.Id, u.Login, u.Password, u.Email, u.Payload)
 }
 
 // NewToken creates a new token using private key.
