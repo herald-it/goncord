@@ -43,7 +43,7 @@ func main() {
 	us := controllers.NewServiceController(getSession())
 
 	coll := middleware.MidCollect{}
-	coll = coll.Add(middleware.CheckPermission)
+	coll = coll.Add(middleware.CheckPermission).Add(middleware.Logging)
 
 	router := New()
 	router.POST(
