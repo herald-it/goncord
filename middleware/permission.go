@@ -19,7 +19,7 @@ import (
 //  	  register:
 //          path: /reg
 //	    allowedhost:
-//	      - localhost:8000
+//	      - localhost
 func CheckPermission(next Handle) Handle {
 	return func(w http.ResponseWriter, r *http.Request, p Params) {
 		path := strings.Split(r.RequestURI, "?")[0]
