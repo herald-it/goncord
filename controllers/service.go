@@ -52,7 +52,6 @@ func (sc ServiceController) Logout(
 		return &HttpError{err, "Delete token error.", 500}
 	}
 
-	w.Write([]byte("The token was successfully deleted."))
 	return nil
 }
 
