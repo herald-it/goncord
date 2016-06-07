@@ -167,7 +167,7 @@ func (uc UserController) UpdateUser(
 
 	updUsrText := r.PostFormValue("user")
 	if updUsrText == "" {
-		return &HttpError{nil, "Empty update user form.", 500}
+		return &HttpError{nil, "Empty user field.", 500}
 	}
 
 	usr := new(models.User)
