@@ -87,7 +87,7 @@ func (uc UserController) LoginUser(
 		Value:    token,
 		Domain:   models.Set.Domain,
 		HttpOnly: true,
-		Secure:   false}) // TODO: HTTPS. Если true то токена не видно.
+		Secure:   false})
 
 	if err = uc.dumpUser(userExist, token); err != nil {
 		return &HttpError{err, "Token can not be dumped.", 500}
