@@ -30,9 +30,11 @@ func TestLoadSettings(t *testing.T) {
 				So(models.Set.Ssl.Certificate, ShouldEqual, "./pass_certificate")
 			})
 			Convey("Router section", func() {
-				So(models.Set.Router.Login, ShouldEqual, "log")
-				So(models.Set.Router.Register, ShouldEqual, "reg")
-				So(models.Set.Router.Validate, ShouldEqual, "valid")
+				So(models.Set.Router.Login.Path, ShouldEqual, "/login")
+				So(models.Set.Router.Register.Path, ShouldEqual, "/register")
+				So(models.Set.Router.Validate.Path, ShouldEqual, "/validate")
+				So(models.Set.Router.Logout.Path, ShouldEqual, "/logout")
+				So(models.Set.Router.Update.Path, ShouldEqual, "/update")
 			})
 
 			So(models.Set.Domain, ShouldEqual, "my.domain.com")
