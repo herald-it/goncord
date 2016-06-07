@@ -25,27 +25,29 @@ func CheckPermission(next Handle) Handle {
 		path := strings.Split(r.RequestURI, "?")[0]
 		flagPermission := true
 
+		remoteAddr := getIP(r.RemoteAddr)
+
 		switch path {
 		case models.Set.Router.Register.Path:
 			flagPermission = flagPermission && contains(
-				r.RemoteAddr,
+				remoteAddr,
 				models.Set.Router.Register.AllowedHost)
 		case models.Set.Router.Login.Path:
 			flagPermission = flagPermission && contains(
-				r.RemoteAddr,
+				remoteAddr,
 				models.Set.Router.Login.AllowedHost)
 		case models.Set.Router.Validate.Path:
 			flagPermission = flagPermission && contains(
-				r.RemoteAddr,
+				remoteAddr,
 				models.Set.Router.Validate.AllowedHost)
 		case models.Set.Router.Logout.Path:
 			flagPermission = flagPermission && contains(
-				r.RemoteAddr,
+				remoteAddr,
 				models.Set.Router.Logout.AllowedHost)
 		}
 
 		if !flagPermission {
-			log.Println("Remote address: ", r.RemoteAddr, " request rejected.")
+			log.Println("Remote address: ", remoteAddr, " request rejected.")
 			log.Println("Insufficient permissions.")
 
 			http.Error(w, "Insufficient rights.", 500)
@@ -54,6 +56,16 @@ func CheckPermission(next Handle) Handle {
 
 		next(w, r, p)
 	}
+}
+
+func getIP(addr string) string {
+	tmp := strings.Split(addr, ":")
+
+	if len(tmp) >= 1 {
+		return tmp[0]
+	}
+
+	return "Invalid remote address."
 }
 
 func contains(s string, arr []string) bool {
