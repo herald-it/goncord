@@ -8,6 +8,8 @@ import (
 	. "github.com/julienschmidt/httprouter"
 )
 
+// Logging middleware produces logging of queries.
+// Prints the request processing time.
 func Logging(next Handle) Handle {
 	return func(w http.ResponseWriter, r *http.Request, p Params) {
 		log.Println("\033[7m\033[1mThe incoming request:\033[0m ", r)
