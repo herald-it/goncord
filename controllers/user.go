@@ -69,7 +69,7 @@ func (uc UserController) LoginUser(
 
 	userExist, err := querying.FindUser(usr, collect)
 	if userExist == nil || err != nil {
-		return &HttpError{err, "User not exist.", 500}
+		return &HttpError{err, "User does not exist.", 500}
 	}
 
 	keyPair, err := keygen.NewKeyPair()
