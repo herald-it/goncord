@@ -18,6 +18,5 @@ func Logging(next Handle) Handle {
 
 		log.Println("The request has been processed.")
 		log.Printf("\033[7m\033[1mElapsed time: %v\033[0m", t1.Sub(t0))
-
 	}
 }
