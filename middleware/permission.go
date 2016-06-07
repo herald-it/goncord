@@ -21,7 +21,7 @@ import (
 //	    allowedhost:
 //	      - localhost:8000
 func CheckPermission(next Handle) Handle {
-	return Handle(func(w http.ResponseWriter, r *http.Request, p Params) {
+	return func(w http.ResponseWriter, r *http.Request, p Params) {
 		path := strings.Split(r.RequestURI, "?")[0]
 		flagPermission := true
 
@@ -53,7 +53,7 @@ func CheckPermission(next Handle) Handle {
 		}
 
 		next(w, r, p)
-	})
+	}
 }
 
 func contains(s string, arr []string) bool {
