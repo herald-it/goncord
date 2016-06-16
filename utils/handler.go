@@ -25,7 +25,7 @@ type ErrHandler func(http.ResponseWriter, *http.Request, Params) *HttpError
 func ErrWrap(eh ErrHandler) Handle {
 	return Handle(func(w http.ResponseWriter, r *http.Request, p Params) {
 		if e := eh(w, r, p); e != nil {
-			log.Printf("Error: %v Message: %v Code: %v\n", e.Error, e.Message, e.Code)
+			log.Printf("\033[7m\033[1mError: %v Message: %v Code: %v\033[0m", e.Error, e.Message, e.Code)
 
 			if failureURL := r.URL.Query().Get("failure"); failureURL != "" {
 				http.Redirect(w, r, failureURL, 301)
@@ -33,7 +33,7 @@ func ErrWrap(eh ErrHandler) Handle {
 				http.Error(w, e.Message, e.Code)
 			}
 		} else {
-			log.Printf("Success\n\033[7m\033[1mStatus: %v\033[0m", e.Code)
+			log.Printf("\033[7m\033[1mSuccessfully.\033[0m")
 
 			if successURL := r.URL.Query().Get("success"); successURL != "" {
 				http.Redirect(w, r, successURL, 301)

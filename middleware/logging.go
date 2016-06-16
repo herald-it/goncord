@@ -12,13 +12,19 @@ import (
 // Prints the request processing time.
 func Logging(next Handle) Handle {
 	return func(w http.ResponseWriter, r *http.Request, p Params) {
-		log.Println("\033[7m\033[1mThe incoming request:\033[0m ", r)
+		log.Println("\033[7m\033[1mIncoming request.\033[0m")
+		log.Printf("\033[7m\033[1mMethod:\033[0m %v", r.Method)
+		log.Printf("\033[7m\033[1mForm:\033[0m %v", r.Form)
+		log.Printf("\033[7m\033[1mHost:\033[0m %v", r.Host)
+		log.Printf("\033[7m\033[1mRemote address:\033[0m %v", r.RemoteAddr)
+		log.Printf("\033[7m\033[1mRequest URI:\033[0m %v", r.RequestURI)
+		log.Printf("\033[7m\033[1mUser agent:\033[0m %v", r.UserAgent())
+		log.Printf("\033[7m\033[1mHeaders:\033[0m %v", r.Header)
 
 		t0 := time.Now()
 		next(w, r, p)
 		t1 := time.Now()
 
-		log.Println("The request has been processed.")
 		log.Printf("\033[7m\033[1mElapsed time: %v\033[0m", t1.Sub(t0))
 	}
 }
