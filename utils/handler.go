@@ -33,6 +33,8 @@ func ErrWrap(eh ErrHandler) Handle {
 				http.Error(w, e.Message, e.Code)
 			}
 		} else {
+			log.Printf("Success\n\033[7m\033[1mStatus: %v\033[0m", e.Code)
+
 			if successURL := r.URL.Query().Get("success"); successURL != "" {
 				http.Redirect(w, r, successURL, 301)
 			}
