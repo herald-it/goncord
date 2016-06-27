@@ -126,7 +126,9 @@ func getToken(r *http.Request) (string, *HttpError) {
 
 // checkLifeTime checks the token lifetime.
 func checkLifeTime(token *jwt.Token) bool {
-	lifeTime := token.Claims["iat"]
+	claims := token.Claims.(jwt.MapClaims)
+
+	lifeTime := claims["iat"]
 	timeSpan := time.Now().Unix() - int64(lifeTime.(float64))
 
 	return timeSpan > (7 * 24 * 60 * 60)
