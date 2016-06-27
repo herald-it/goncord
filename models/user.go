@@ -27,9 +27,12 @@ func (u User) String() string {
 // pk - the private key.
 func (u User) NewToken(pk *rsa.PrivateKey) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
-	token.Claims["email"] = u.Email
-	token.Claims["login"] = u.Login
-	token.Claims["iat"] = time.Now().Unix()
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	claims["email"] = u.Email
+	claims["login"] = u.Login
+	claims["iat"] = time.Now().Unix()
 
 	rawTokenStrng, err := token.SigningString()
 	if err != nil {
