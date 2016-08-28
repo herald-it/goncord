@@ -45,7 +45,7 @@ func (sc ServiceController) Logout(
 	token.Token = tokenTmp
 
 	if token.Token == "" {
-		return &HttpError{nil, "Invalid token value.", 500}
+		return &HttpError{nil, "Empty token value.", 500}
 	}
 
 	if err := collect.Remove(token); err != nil {
@@ -75,7 +75,7 @@ func (sc ServiceController) IsValid(
 	token.Token = tokenTmp
 
 	if token.Token == "" {
-		return &HttpError{nil, "Invalid token value.", 500}
+		return &HttpError{nil, "Empty token value.", 500}
 	}
 
 	findDumpToken, err := querying.FindDumpToken(token, collect)
