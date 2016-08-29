@@ -1,0 +1,21 @@
+database:
+  host: localhost
+  dbname: testdb
+  tokentable: tokentable
+  usertable: usertable
+ssl:
+  key: ./pass_key
+  certificate: ./pass_certificate
+router:
+  register: 
+    path: /register
+  login: 
+    path: /login
+  validate: 
+    path: /validate
+  logout: 
+    path: /logout
+  update: 
+    path: /update
+domain: my.domain.com
+ip: 0.0.0.0:8000
