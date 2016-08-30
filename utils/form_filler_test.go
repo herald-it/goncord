@@ -77,5 +77,34 @@ func TestFormFiller(t *testing.T) {
 			So(testStruct.Field2, ShouldEqual, "2")
 			So(testStruct.Field3, ShouldEqual, 3.0)
 		})
+
+		Convey("Test fill object method on error case", func() {
+			testStruct := struct {
+				Field1 int
+				Field2 string
+				Field3 float64
+			}{}
+
+			err := utils.Fill(
+				testStruct,
+				url.Values{
+					"Field1": []string{"1"},
+				},
+				"Field1",
+			)
+
+			So(err, ShouldBeNil)
+
+			err = utils.Fill(
+				testStruct,
+				url.Values{
+					"...": []string{"1"},
+				},
+				"Field1",
+			)
+
+			So(err, ShouldNotBeNil)
+			So(err.Error(), ShouldEqual, "Required fields not found.")
+		})
 	})
 }
