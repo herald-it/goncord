@@ -72,7 +72,6 @@ func Fill(obj interface{}, m url.Values, required ...string) error {
 			}
 		case reflect.String:
 			f.SetString(v[0])
-
 		default:
 			fmt.Printf("Unsupported format %v for field %s\n", f.Type().Kind(), k)
 		}
