@@ -31,9 +31,9 @@ func Fill(obj interface{}, m url.Values, required ...string) error {
 
 		flagExist := false
 		for _, field := range fields {
-			_, exist := m[field]
+			_, isExist := m[field]
 
-			flagExist = flagExist || exist
+			flagExist = flagExist || isExist
 		}
 		if !flagExist {
 			return errors.New("Required fields not found.")
