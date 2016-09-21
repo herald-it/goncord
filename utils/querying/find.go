@@ -5,7 +5,7 @@ import (
 
 	. "github.com/herald-it/goncord/models"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
+	. "gopkg.in/mgo.v2/bson"
 )
 
 // FindUserID looking for a user in the collection.
@@ -36,10 +36,29 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	var results []User
 
 	err := c.Find(
-		bson.M{"$or": []bson.M{
-			bson.M{"login": obj.Login},
-			bson.M{"email": obj.Email},
-		}}).All(&results)
+		M{
+			"$and": []M{
+				M{
+					"password": obj.Password,
+				},
+				M{
+					"$or": []M{
+						M{"login": obj.Login},
+						M{"email": obj.Email},
+					},
+				},
+			},
+		},
+	).All(&results)
+
+	// err := c.Find(
+	// 	M{
+	// 		"$and": []M{
+	// 			M{"password": obj.Password},
+	// 			"$or": []M{
+	// 				M{"login": obj.Login},
+	// 				M{"email": obj.Email},
+	// 			}}}).All(&results)
 	if err != nil {
 		return nil, err
 	}
