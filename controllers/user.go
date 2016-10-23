@@ -16,14 +16,19 @@ import (
 	"gopkg.in/mgo.v2"
 )
 
+// UserController get access for instance mongo db.
 type UserController struct {
 	session *mgo.Session
 }
 
+// GetDB - get current mongo session.
+// Return:
+// 	current mongo session.
 func (uc UserController) GetDB() *mgo.Database {
 	return uc.session.DB(models.Set.Database.DbName)
 }
 
+// NewUserController create new user contgroller.
 func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
 }

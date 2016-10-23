@@ -21,6 +21,7 @@ var (
 
 func getSession() *mgo.Session {
 	s, err := mgo.Dial(models.Set.Database.Host)
+
 	if err != nil {
 		panic(err)
 	}
