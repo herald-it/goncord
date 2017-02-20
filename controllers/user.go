@@ -165,7 +165,7 @@ func (uc UserController) UpdateUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C(models.Set.Database.UserTable)
+	collect := uc.GetDB().C(models.Set.Database.TokenTable)
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
