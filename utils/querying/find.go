@@ -74,7 +74,7 @@ func FindDumpToken(obj *DumpToken, c *mgo.Collection) (*DumpToken, error) {
 
 	var results []DumpToken
 
-	err := c.Find(obj).All(&results)
+	err := c.Find(M{"token": obj.Token}).All(&results)
 	if err != nil {
 		return nil, err
 	}
