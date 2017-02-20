@@ -34,15 +34,15 @@ func (u User) NewToken(pk *rsa.PrivateKey) (string, error) {
 	claims["login"] = u.Login
 	claims["iat"] = time.Now().Unix()
 
-	rawTokenStrng, err := token.SigningString()
+	rawTokenString, err := token.SigningString()
 	if err != nil {
 		return "", err
 	}
 
-	sign, err := token.Method.Sign(rawTokenStrng, pk)
+	sign, err := token.Method.Sign(rawTokenString, pk)
 	if err != nil {
 		return "", err
 	}
 
-	return rawTokenStrng + "." + sign, nil
+	return rawTokenString + "." + sign, nil
 }
