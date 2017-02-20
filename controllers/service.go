@@ -31,9 +31,9 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 // the database. The next validation
 // the user is not authorized.
 func (sc ServiceController) Logout(
-	w http.ResponseWriter,
-	r *http.Request,
-	ps httprouter.Params) *HttpError {
+w http.ResponseWriter,
+r *http.Request,
+ps httprouter.Params) *HttpError {
 
 	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 	token := models.DumpToken{}
@@ -45,11 +45,11 @@ func (sc ServiceController) Logout(
 	token.Token = tokenTmp
 
 	if token.Token == "" {
-		return &HttpError{nil, "Empty token value.", 500}
+		return &HttpError{Error: nil, Message: "Empty token value.", Code: 500}
 	}
 
 	if err := collect.Remove(token); err != nil {
-		return &HttpError{err, "Delete token error.", 500}
+		return &HttpError{Error: err, Message: "Delete token error.", Code: 500}
 	}
 
 	return nil
@@ -61,9 +61,9 @@ func (sc ServiceController) Logout(
 // If the token is valid, the response will contain
 // user model in json format.
 func (sc ServiceController) IsValid(
-	w http.ResponseWriter,
-	r *http.Request,
-	ps httprouter.Params) *HttpError {
+w http.ResponseWriter,
+r *http.Request,
+ps httprouter.Params) *HttpError {
 
 	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 	token := &models.DumpToken{}
@@ -75,18 +75,18 @@ func (sc ServiceController) IsValid(
 	token.Token = tokenTmp
 
 	if token.Token == "" {
-		return &HttpError{nil, "Empty token value.", 500}
+		return &HttpError{Error: nil, Message: "Empty token value.", Code: 500}
 	}
 
 	findDumpToken, err := querying.FindDumpToken(token, collect)
 	if err != nil || findDumpToken == nil {
-		return &HttpError{err, "Token not found.", 500}
+		return &HttpError{Error: err, Message: "Token not found.", Code: 500}
 	}
 
 	tokenParse, err := jwt.Parse(findDumpToken.Token, nil)
 	if checkLifeTime(tokenParse) {
 		collect.Remove(findDumpToken)
-		return &HttpError{nil, "Time token life has expired.", 500}
+		return &HttpError{Error: nil, Message: "Time token life has expired.", Code: 500}
 	}
 
 	usr := new(models.User)
@@ -94,12 +94,12 @@ func (sc ServiceController) IsValid(
 
 	findUsr, err := querying.FindUserID(usr, sc.GetDB().C(models.Set.Database.UserTable))
 	if err != nil {
-		return &HttpError{err, "User not found.", 500}
+		return &HttpError{Error: err, Message: "User not found.", Code: 500}
 	}
 
 	jsonUsr, err := json.Marshal(findUsr)
 	if err != nil {
-		return &HttpError{err, "User can not convert to json.", 500}
+		return &HttpError{Error: err, Message: "User can not convert to json.", Code: 500}
 	}
 
 	w.Write(jsonUsr)
@@ -114,7 +114,7 @@ func getToken(r *http.Request) (string, *HttpError) {
 	jwtCookie, err := r.Cookie("jwt")
 	if err != nil {
 		if err := r.ParseForm(); err != nil {
-			return "", &HttpError{err, "Post form can not be parsed.", 500}
+			return "", &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 		}
 
 		token := r.PostForm.Get("jwt")
