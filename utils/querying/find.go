@@ -50,15 +50,7 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 			},
 		},
 	).All(&results)
-
-	// err := c.Find(
-	// 	M{
-	// 		"$and": []M{
-	// 			M{"password": obj.Password},
-	// 			"$or": []M{
-	// 				M{"login": obj.Login},
-	// 				M{"email": obj.Email},
-	// 			}}}).All(&results)
+	
 	if err != nil {
 		return nil, err
 	}
