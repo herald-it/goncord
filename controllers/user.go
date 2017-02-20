@@ -14,6 +14,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // UserController get access for instance mongo db.
@@ -62,29 +63,29 @@ func (uc UserController) LoginUser(
 	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
-		return &HttpError{err, "Post form can not be parsed.", 500}
+		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 	}
 
 	usr := new(models.User)
 	if err := Fill(usr, r.PostForm, "login|email", "password"); err != nil {
-		return &HttpError{err, "Error fill form. Not all fields are specified.", 500}
+		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	userExist, err := querying.FindUser(usr, collect)
 	if userExist == nil || err != nil {
-		return &HttpError{err, "User does not exist.", 500}
+		return &HttpError{Error: err, Message: "User does not exist.", Code: 500}
 	}
 
 	keyPair, err := keygen.NewKeyPair()
 	if err != nil {
-		return &HttpError{err, "New key pair error.", 500}
+		return &HttpError{Error: err, Message: "New key pair error.", Code: 500}
 	}
 
 	token, err := userExist.NewToken(keyPair.Private)
 	if err != nil {
-		return &HttpError{err, "New token error.", 500}
+		return &HttpError{Error: err, Message: "New token error.", Code: 500}
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -95,7 +96,7 @@ func (uc UserController) LoginUser(
 		Secure:   false})
 
 	if err = uc.dumpUser(userExist, token); err != nil {
-		return &HttpError{err, "Token can not be dumped.", 500}
+		return &HttpError{Error: err, Message: "Token can not be dumped.", Code: 500}
 	}
 
 	log.Println("Token added: ", token)
@@ -123,27 +124,27 @@ func (uc UserController) RegisterUser(
 	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
-		return &HttpError{err, "Post form can not be parsed.", 500}
+		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 	}
 
 	usr := new(models.User)
 	if err := Fill(usr, r.PostForm, "login", "email", "password"); err != nil {
-		return &HttpError{err, "Error fill form. Not all fields are specified.", 500}
+		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
 
 	if usr.Login == "" || usr.Email == "" || usr.Password == "" {
-		return &HttpError{nil, "All required fields were not filled.", 500}
+		return &HttpError{Error: nil, Message: "All required fields were not filled.", Code: 500}
 	}
 
 	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
 
 	isUserExist, err := querying.IsExistUser(usr, collect)
 	if err != nil {
-		return &HttpError{err, "Error check user exist.", 500}
+		return &HttpError{Error: err, Message: "Error check user exist.", Code: 500}
 	}
 
 	if isUserExist {
-		return &HttpError{nil, "User already exist.", 500}
+		return &HttpError{Error: nil, Message: "User already exist.", Code: 500}
 	}
 
 	collect.Insert(&usr)
@@ -167,21 +168,40 @@ func (uc UserController) UpdateUser(
 	collect := uc.GetDB().C(models.Set.Database.UserTable)
 
 	if err := r.ParseForm(); err != nil {
-		return &HttpError{err, "Post form can not be parsed.", 500}
+		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 	}
 
 	updUsrText := r.PostFormValue("user")
 	if updUsrText == "" {
-		return &HttpError{nil, "Empty user field.", 500}
+		return &HttpError{Error: nil, Message: "Empty user field.", Code: 500}
 	}
 
 	usr := new(models.User)
 	if err := json.Unmarshal([]byte(updUsrText), usr); err != nil {
-		return &HttpError{err, "Error unmarshal json to user model.", 500}
+		return &HttpError{Error: err, Message: "Error unmarshal json to user model.", Code: 500}
 	}
 
-	if err := collect.UpdateId(usr.ID, usr); err != nil {
-		return &HttpError{err, "Error updating user model.", 500}
+	token := &models.DumpToken{}
+
+	tokenTmp, httpErr := getToken(r)
+	if httpErr != nil {
+		return httpErr
+	}
+	token.Token = tokenTmp
+
+	if token.Token == "" {
+		return &HttpError{Error: nil, Message: "Empty token value.", Code: 500}
+	}
+
+	findDumpToken, err := querying.FindDumpToken(token, collect)
+	if err != nil || findDumpToken == nil {
+		return &HttpError{Error: err, Message: "Token not found.", Code: 500}
+	}
+
+	usrID := findDumpToken.UserId
+
+	if err := collect.UpdateId(usrID, bson.M{"$set": usr}); err != nil {
+		return &HttpError{Error: err, Message: "Error updating user model.", Code: 500}
 	}
 
 	return nil
