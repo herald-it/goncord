@@ -6,6 +6,7 @@ import (
 	. "github.com/herald-it/goncord/models"
 	"gopkg.in/mgo.v2"
 	. "gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 // FindUserID looking for a user in the collection.
@@ -50,7 +51,7 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 			},
 		},
 	).All(&results)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -69,6 +70,8 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 // FindDumpToken searches the token in the collection.
 // If found more than 1 token returns an error.
 func FindDumpToken(obj *DumpToken, c *mgo.Collection) (*DumpToken, error) {
+	log.Println(obj.Token)
+
 	var results []DumpToken
 
 	err := c.Find(obj).All(&results)
