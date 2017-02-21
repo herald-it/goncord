@@ -6,7 +6,6 @@ import (
 	. "github.com/herald-it/goncord/models"
 	"gopkg.in/mgo.v2"
 	. "gopkg.in/mgo.v2/bson"
-	"log"
 )
 
 // FindUserID looking for a user in the collection.
@@ -39,13 +38,13 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 	err := c.Find(
 		M{
 			"$and": []M{
-				M{
+				{
 					"password": obj.Password,
 				},
-				M{
+				{
 					"$or": []M{
-						M{"login": obj.Login},
-						M{"email": obj.Email},
+						{"login": obj.Login},
+						{"email": obj.Email},
 					},
 				},
 			},
@@ -70,27 +69,20 @@ func FindUser(obj *User, c *mgo.Collection) (*User, error) {
 // FindDumpToken searches the token in the collection.
 // If found more than 1 token returns an error.
 func FindDumpToken(obj *DumpToken, c *mgo.Collection) (*DumpToken, error) {
-	log.Println(obj.Token)
-	log.Println(M{"token": obj.Token})
-
 	var results []DumpToken
 
 	err := c.Find(M{"token": obj.Token}).All(&results)
 	if err != nil {
 		return nil, err
 	}
-	log.Println(1)
-
 
 	if len(results) > 1 {
 		return nil, errors.New("Find user returned more 1 record.")
 	}
-	log.Println(2)
 
 	if len(results) == 0 {
 		return nil, nil
 	}
-	log.Println(3)
 
 	return &results[0], nil
 }

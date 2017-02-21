@@ -7,20 +7,26 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"gopkg.in/mgo.v2/bson"
+	"github.com/herald-it/goncord/utils/pwd_hash"
+	"gopkg.in/mgo.v2"
 )
 
 // User model.
 type User struct {
 	ID       bson.ObjectId `json:"_id,omitempty" bson:"_id,omitempty"`
-	Login    string        `json:"login" bson:"login,omitempty"`
-	Password string        `json:"password" bson:"password,omitempty"`
-	Email    string        `json:"email" bson:"email,omitempty"`
+	Login    string        `json:"login,omitempty" bson:"login,omitempty"`
+	Password string        `json:"password,omitempty" bson:"password,omitempty"`
+	Email    string        `json:"email,omitempty" bson:"email,omitempty"`
 	Payload  string        `json:"payload,omitempty" bson:"payload,omitempty"`
 }
 
 // Implement stringer
 func (u User) String() string {
 	return fmt.Sprintf("Id: %v\tLogin: %v\tPassword: %v\tEmail: %v\nPayload: %v", u.ID, u.Login, u.Password, u.Email, u.Payload)
+}
+
+func (u *User) SetPassword(password string) {
+	u.Password = pwd_hash.HashPassword(password)
 }
 
 // NewToken creates a new token using private key.
@@ -45,4 +51,8 @@ func (u User) NewToken(pk *rsa.PrivateKey) (string, error) {
 	}
 
 	return rawTokenString + "." + sign, nil
+}
+
+func (u User) Update(collect *mgo.Collection) (error) {
+	return collect.UpdateId(u.ID, u)
 }

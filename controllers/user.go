@@ -29,6 +29,14 @@ func (uc UserController) GetDB() *mgo.Database {
 	return uc.session.DB(models.Set.Database.DbName)
 }
 
+func (uc *UserController) getUserTable() *mgo.Collection {
+	return uc.session.DB(models.Set.Database.DbName).C(models.Set.Database.UserTable)
+}
+
+func (uc *UserController) getTokenTable() *mgo.Collection {
+	return uc.session.DB(models.Set.Database.DbName).C(models.Set.Database.TokenTable)
+}
+
 // NewUserController create new user contgroller.
 func NewUserController(s *mgo.Session) *UserController {
 	return &UserController{s}
@@ -37,7 +45,7 @@ func NewUserController(s *mgo.Session) *UserController {
 // dumpUser save user and token to table token_dump.
 func (uc UserController) dumpUser(usr *models.User, token string) error {
 	dumpToken := models.NewDumpToken(usr, token)
-	err := uc.GetDB().C(models.Set.Database.TokenTable).Insert(&dumpToken)
+	err := uc.getTokenTable().Insert(&dumpToken)
 
 	return err
 }
@@ -60,7 +68,7 @@ func (uc UserController) LoginUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C(models.Set.Database.UserTable)
+	collect := uc.getUserTable()
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
@@ -71,7 +79,7 @@ func (uc UserController) LoginUser(
 		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
 
-	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
+	usr.SetPassword(usr.Password)
 
 	userExist, err := querying.FindUser(usr, collect)
 	if userExist == nil || err != nil {
@@ -121,7 +129,7 @@ func (uc UserController) RegisterUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C(models.Set.Database.UserTable)
+	collect := uc.getUserTable()
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
@@ -136,13 +144,12 @@ func (uc UserController) RegisterUser(
 		return &HttpError{Error: nil, Message: "All required fields were not filled.", Code: 500}
 	}
 
-	usr.Password = hex.EncodeToString(pwd_hash.Sum([]byte(usr.Password)))
+	usr.SetPassword(usr.Password)
 
 	isUserExist, err := querying.IsExistUser(usr, collect)
 	if err != nil {
 		return &HttpError{Error: err, Message: "Error check user exist.", Code: 500}
 	}
-
 	if isUserExist {
 		return &HttpError{Error: nil, Message: "User already exist.", Code: 500}
 	}
@@ -165,7 +172,7 @@ func (uc UserController) UpdateUser(
 	r *http.Request,
 	ps httprouter.Params) *HttpError {
 
-	collect := uc.GetDB().C(models.Set.Database.TokenTable)
+	userCollect := uc.getUserTable()
 
 	if err := r.ParseForm(); err != nil {
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
@@ -181,28 +188,129 @@ func (uc UserController) UpdateUser(
 		return &HttpError{Error: err, Message: "Error unmarshal json to user model.", Code: 500}
 	}
 
-	token := &models.DumpToken{}
-
-	tokenTmp, httpErr := getToken(r)
-	if httpErr != nil {
-		return httpErr
-	}
-	token.Token = tokenTmp
-
-	if token.Token == "" {
-		return &HttpError{Error: nil, Message: "Empty token value.", Code: 500}
+	httpError := checkUpdateRules(usr)
+	if httpError != nil {
+		return httpError
 	}
 
-	findDumpToken, err := querying.FindDumpToken(token, collect)
-	if err != nil || findDumpToken == nil {
-		return &HttpError{Error: err, Message: "Token not found.", Code: 500}
+	dumpToken, httpError := uc.getDumpTokenFromRequest(r)
+	if httpError != nil {
+		return httpError
 	}
 
-	usrID := findDumpToken.UserId
-
-	if err := collect.UpdateId(usrID, bson.M{"$set": usr}); err != nil {
+	usrID := dumpToken.UserId
+	if err := userCollect.UpdateId(usrID, bson.M{"$set": usr}); err != nil {
 		return &HttpError{Error: err, Message: "Error updating user model.", Code: 500}
 	}
 
 	return nil
+}
+
+func (uc UserController) ResetPassword(
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Params) *HttpError {
+
+	err := r.ParseForm()
+	if err != nil {
+		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
+	}
+
+	data := r.PostForm
+	oldPassword := data.Get("old_password")
+	newPassword := data.Get("new_password")
+
+	user, httpErr := uc.getUserFromRequest(r)
+	if httpErr != nil {
+		return httpErr
+	}
+
+	if (oldPassword == "") {
+		return uc.forcePasswordChange(user, newPassword)
+	} else {
+		return uc.passwordChange(user, oldPassword, newPassword)
+	}
+
+	return nil
+}
+
+func (uc UserController) forcePasswordChange(user *models.User, password string) *HttpError {
+	if (password == "") {
+		return &HttpError{Error: nil, Message: "Password should be not empty.", Code: 500}
+	}
+
+	user.SetPassword(password)
+	err := user.Update(uc.getUserTable())
+	if err != nil {
+		return &HttpError{Error: err, Message: "User update problem.", Code: 500}
+	}
+
+	return nil
+}
+
+func (uc UserController) passwordChange(user *models.User, oldPassword, newPassword string) *HttpError {
+	hashOldPassword := hex.EncodeToString(pwd_hash.Sum([]byte(oldPassword)))
+
+	if hashOldPassword != user.Password {
+		return &HttpError{Error: nil, Message: "Old password not equal current password.", Code: 500}
+	}
+
+	user.SetPassword(newPassword)
+	err := user.Update(uc.getUserTable())
+	if err != nil {
+		return &HttpError{Error: nil, Message: "User update problem.", Code: 500}
+	}
+
+	return nil
+}
+
+func checkUpdateRules(usr *models.User) *HttpError {
+	if usr.ID != "" || usr.Login != "" || usr.Email != "" {
+		return &HttpError{
+			Error: nil,
+			Message: "ID, login, email does not update the field.",
+			Code: 500}
+	}
+	if usr.Password != "" {
+		return &HttpError{
+			Error: nil,
+			Message: "Password does not update field. Please use change password view.",
+			Code: 500}
+	}
+
+	return nil
+}
+
+func (uc UserController) getUserFromRequest(r *http.Request) (*models.User, *HttpError) {
+	userCollection := uc.GetDB().C(models.Set.Database.UserTable)
+
+	token, httError := uc.getDumpTokenFromRequest(r)
+	if httError != nil {
+		return nil, httError
+	}
+
+	tmpUsr := &models.User{ID: token.UserId}
+	user, err := querying.FindUserID(tmpUsr, userCollection)
+	if err != nil {
+		return nil, &HttpError{Error: err, Message: "Error find user"}
+	}
+
+	return user, nil
+}
+
+func (uc UserController) getDumpTokenFromRequest(r *http.Request) (*models.DumpToken, *HttpError) {
+	tokenCollect := uc.GetDB().C(models.Set.Database.TokenTable)
+
+	token := &models.DumpToken{}
+	tokenTmp, httpErr := getToken(r)
+	if httpErr != nil {
+		return nil, httpErr
+	}
+	token.Token = tokenTmp
+	findDumpToken, err := querying.FindDumpToken(token, tokenCollect)
+	if err != nil || findDumpToken == nil {
+		return nil, &HttpError{Error: err, Message: "Token not found.", Code: 500}
+	}
+
+	return findDumpToken, nil
 }

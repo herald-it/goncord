@@ -17,5 +17,7 @@ router:
     path: /logout
   update: 
     path: /update
+  resetpassword:
+    path: /reset
 domain: my.domain.com
 ip: 0.0.0.0:8000

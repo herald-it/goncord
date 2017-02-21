@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"hash"
+	"encoding/hex"
 )
 
 const Size = 16
@@ -49,4 +50,8 @@ func Sum(in []byte) []byte {
 	md5 := md5.Sum(sha1[:])
 
 	return md5[:]
+}
+
+func HashPassword(password string) string {
+	return hex.EncodeToString(Sum([]byte(password)))
 }

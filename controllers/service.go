@@ -121,6 +121,10 @@ func getToken(r *http.Request) (string, *HttpError) {
 		return token, nil
 	}
 
+	if jwtCookie.Value == "" {
+		return "", &HttpError{Error: nil, Message: "Empty token value.", Code: 500}
+	}
+
 	return jwtCookie.Value, nil
 }
 

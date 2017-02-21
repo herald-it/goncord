@@ -35,6 +35,7 @@ func TestLoadSettings(t *testing.T) {
 				So(models.Set.Router.Validate.Path, ShouldEqual, "/validate")
 				So(models.Set.Router.Logout.Path, ShouldEqual, "/logout")
 				So(models.Set.Router.Update.Path, ShouldEqual, "/update")
+				So(models.Set.Router.ResetPassword.Path, ShouldEqual, "/reset")
 			})
 
 			So(models.Set.Domain, ShouldEqual, "my.domain.com")
