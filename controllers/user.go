@@ -225,17 +225,15 @@ func (uc UserController) ResetPassword(
 		return httpErr
 	}
 
-	if (oldPassword == "") {
+	if oldPassword == "" {
 		return uc.forcePasswordChange(user, newPassword)
 	} else {
 		return uc.passwordChange(user, oldPassword, newPassword)
 	}
-
-	return nil
 }
 
 func (uc UserController) forcePasswordChange(user *models.User, password string) *HttpError {
-	if (password == "") {
+	if password == "" {
 		return &HttpError{Error: nil, Message: "Password should be not empty.", Code: 500}
 	}
 
@@ -267,15 +265,15 @@ func (uc UserController) passwordChange(user *models.User, oldPassword, newPassw
 func checkUpdateRules(usr *models.User) *HttpError {
 	if usr.ID != "" || usr.Login != "" || usr.Email != "" {
 		return &HttpError{
-			Error: nil,
+			Error:   nil,
 			Message: "ID, login, email does not update the field.",
-			Code: 500}
+			Code:    500}
 	}
 	if usr.Password != "" {
 		return &HttpError{
-			Error: nil,
+			Error:   nil,
 			Message: "Password does not update field. Please use change password view.",
-			Code: 500}
+			Code:    500}
 	}
 
 	return nil
