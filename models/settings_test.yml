@@ -19,6 +19,8 @@ router:
     path: /update
   resetpassword:
     path: /reset
-telegramtoken: "test_token"
 domain: my.domain.com
+timber:
+  host: "timber_host"
+  token: "timber_token"
 ip: 0.0.0.0:8000
