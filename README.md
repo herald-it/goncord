@@ -40,7 +40,7 @@ ip: 0.0.0.0:8000
 > \* помечены обязательные поля.
 -------
 
-###Register - [POST]
+##Register - [POST]
 `login*` - логин.
 
 `email*` - почтовый ящик.
@@ -71,7 +71,7 @@ ip: 0.0.0.0:8000
 Обновить можно только поле: payloads.
 Пример запроса на обновление:
 ```json
-{"payload":"{'foo': 'bar'}"}
+user: {"payload":"{'foo': 'bar'}"}
 ```
 
 ##Reset password - [POST]
