@@ -23,20 +23,27 @@ type ErrHandler func(http.ResponseWriter, *http.Request, Params) *HttpError
 // Parameters are passed in the request url, for example:
 // 	http://localhost:8000/login?success=http://google.com&failure=http://ya.ru
 func ErrWrap(eh ErrHandler) Handle {
-	return Handle(func(w http.ResponseWriter, r *http.Request, p Params) {
-		if e := eh(w, r, p); e != nil {
-			log.Printf("\033[7m\033[1m\tError: %v Message: %v Code: %v\033[0m", e.Error, e.Message, e.Code)
+	return Handle(func(writer http.ResponseWriter, request *http.Request, params Params) {
+		if e := eh(writer, request, params); e != nil {
+			log.Printf("\033[7m\033[1m\t ✗ Error: %v Message: %v Code: %v\033[0m",
+				e.Error, e.Message, e.Code)
 
-			if failureURL := r.URL.Query().Get("failure"); failureURL != "" {
-				http.Redirect(w, r, failureURL, 301)
+			go telegramReport(ErrorReport{
+				Error: *e,
+				Params: params,
+				Request: *request,
+			})
+
+			if failureURL := request.URL.Query().Get("failure"); failureURL != "" {
+				http.Redirect(writer, request, failureURL, 301)
 			} else {
-				http.Error(w, e.Message, e.Code)
+				http.Error(writer, e.Message, e.Code)
 			}
 		} else {
-			log.Printf("\033[7m\033[1m\tSuccessfully.\033[0m")
+			log.Printf("\033[7m\033[1m\t ✓ Successfully.\033[0m")
 
-			if successURL := r.URL.Query().Get("success"); successURL != "" {
-				http.Redirect(w, r, successURL, 301)
+			if successURL := request.URL.Query().Get("success"); successURL != "" {
+				http.Redirect(writer, request, successURL, 301)
 			}
 		}
 	})
