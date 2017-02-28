@@ -31,9 +31,9 @@ func NewServiceController(s *mgo.Session) *ServiceController {
 // the database. The next validation
 // the user is not authorized.
 func (sc ServiceController) Logout(
-w http.ResponseWriter,
-r *http.Request,
-ps httprouter.Params) *HttpError {
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Params) *HttpError {
 
 	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 	token := models.DumpToken{}
@@ -61,9 +61,9 @@ ps httprouter.Params) *HttpError {
 // If the token is valid, the response will contain
 // user model in json format.
 func (sc ServiceController) IsValid(
-w http.ResponseWriter,
-r *http.Request,
-ps httprouter.Params) *HttpError {
+	w http.ResponseWriter,
+	r *http.Request,
+	ps httprouter.Params) *HttpError {
 
 	collect := sc.GetDB().C(models.Set.Database.TokenTable)
 	token := &models.DumpToken{}
