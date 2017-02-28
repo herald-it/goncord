@@ -40,6 +40,7 @@ func TestLoadSettings(t *testing.T) {
 
 			So(models.Set.Domain, ShouldEqual, "my.domain.com")
 			So(models.Set.IP, ShouldEqual, "0.0.0.0:8000")
+			So(models.Set.TelegramToken, ShouldEqual, "test_token")
 		})
 	})
 }
