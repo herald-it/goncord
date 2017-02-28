@@ -23,15 +23,16 @@ type Setting struct {
 		Certificate string
 	}
 	Router struct {
-		Register Router
-		Login    Router
-		Validate Router
-		Logout   Router
-		Update   Router
+		Register      Router
+		Login         Router
+		Validate      Router
+		Logout        Router
+		Update        Router
 		ResetPassword Router
 	}
 	Domain string
 	IP     string
+	TelegramToken string
 }
 
 // Set the set of loaded settings.
