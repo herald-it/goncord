@@ -3,8 +3,8 @@ package pwd_hash
 import (
 	"crypto/md5"
 	"crypto/sha1"
-	"hash"
 	"encoding/hex"
+	"hash"
 )
 
 const Size = 16
