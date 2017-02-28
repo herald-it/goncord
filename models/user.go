@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"gopkg.in/mgo.v2/bson"
 	"github.com/herald-it/goncord/utils/pwd_hash"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // User model.
@@ -53,6 +53,6 @@ func (u User) NewToken(pk *rsa.PrivateKey) (string, error) {
 	return rawTokenString + "." + sign, nil
 }
 
-func (u User) Update(collect *mgo.Collection) (error) {
+func (u User) Update(collect *mgo.Collection) error {
 	return collect.UpdateId(u.ID, u)
 }
