@@ -30,9 +30,12 @@ type Setting struct {
 		Update        Router
 		ResetPassword Router
 	}
+	Timber struct {
+		Host string
+		Token string
+       }
 	Domain string
 	IP     string
-	TelegramToken string
 }
 
 // Set the set of loaded settings.
