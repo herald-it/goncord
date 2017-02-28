@@ -13,7 +13,8 @@ import (
 	"github.com/herald-it/goncord/middleware"
 	. "github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
-	"github.com/davecgh/go-spew/spew"
+	"time"
+	"runtime/debug"
 )
 
 var (
@@ -39,13 +40,24 @@ func init() {
 }
 
 func main() {
-	log.Println("Start initialize...")
+	defer func() {
+		if r := recover(); r != nil {
+			TelegramReport(struct{
+				Error string `yaml:"error"`
+				Stack string `yaml:"stack"`
+			}{
+				r.(error).Error(),
+				string(debug.Stack()),
+			})
 
-	spew.Config.Indent = "───"
-	spew.Config.DisableCapacities = true
-	spew.Config.DisableMethods = false
-	spew.Config.DisablePointerAddresses = false
-	spew.Config.DisablePointerMethods = false
+			log.Println(r.(error).Error())
+			log.Println("Wait 5 second...")
+			time.Sleep(5000)
+			main()
+		}
+	}()
+
+	log.Println("Start initialize...")
 
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())

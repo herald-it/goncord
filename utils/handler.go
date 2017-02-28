@@ -28,12 +28,6 @@ func ErrWrap(eh ErrHandler) Handle {
 			log.Printf("\033[7m\033[1m\t ✗ Error: %v Message: %v Code: %v\033[0m",
 				e.Error, e.Message, e.Code)
 
-			go telegramReport(ErrorReport{
-				Error: *e,
-				Params: params,
-				Request: *request,
-			})
-
 			if failureURL := request.URL.Query().Get("failure"); failureURL != "" {
 				http.Redirect(writer, request, failureURL, 301)
 			} else {
