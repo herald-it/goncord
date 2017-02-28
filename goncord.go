@@ -13,6 +13,7 @@ import (
 	"github.com/herald-it/goncord/middleware"
 	. "github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -39,6 +40,12 @@ func init() {
 
 func main() {
 	log.Println("Start initialize...")
+
+	spew.Config.Indent = "───"
+	spew.Config.DisableCapacities = true
+	spew.Config.DisableMethods = false
+	spew.Config.DisablePointerAddresses = false
+	spew.Config.DisablePointerMethods = false
 
 	uc := controllers.NewUserController(getSession())
 	us := controllers.NewServiceController(getSession())
