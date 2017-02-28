@@ -15,6 +15,8 @@ func IsExistDumpToken(obj *DumpToken, c *mgo.Collection) (bool, error) {
 // IsExistUser checks for the existence
 // user in the database.
 func IsExistUser(obj *User, c *mgo.Collection) (bool, error) {
+	obj.Password = ""
+
 	usr, err := FindUser(obj, c)
 	return usr != nil && err == nil, err
 }
