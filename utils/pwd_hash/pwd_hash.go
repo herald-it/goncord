@@ -46,10 +46,10 @@ func (d *digest) Write(p []byte) (n int, err error) {
 }
 
 func Sum(in []byte) []byte {
-	sha1 := sha1.Sum(in)
-	md5 := md5.Sum(sha1[:])
+	bytes := sha1.Sum(in)
+	md5s := md5.Sum(bytes[:])
 
-	return md5[:]
+	return md5s[:]
 }
 
 func HashPassword(password string) string {
