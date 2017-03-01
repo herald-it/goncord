@@ -1,11 +1,12 @@
 package utils
 
 import (
-	"net/http"
-	"github.com/julienschmidt/httprouter"
-	"github.com/herald-it/goncord/models"
-	"net/url"
 	"log"
+	"net/http"
+	"net/url"
+
+	"github.com/herald-it/goncord/models"
+	"github.com/julienschmidt/httprouter"
 	"gopkg.in/yaml.v2"
 )
 
@@ -22,6 +23,7 @@ func TelegramReport(err interface{}) {
 
 	if models.Set.Timber.Token == "" {
 		log.Println("Timber token empty.")
+		return
 	}
 
 	go func() {
@@ -29,7 +31,7 @@ func TelegramReport(err interface{}) {
 
 		resp, err := http.PostForm(models.Set.Timber.Host,
 			url.Values{
-				"token": {models.Set.Timber.Token},
+				"token":   {models.Set.Timber.Token},
 				"message": {string(yamlMessage)},
 			},
 		)
