@@ -2,16 +2,14 @@ package middleware
 
 import . "github.com/julienschmidt/httprouter"
 
-type MiddlewareFunc func(Handle) Handle
-type MidCollect []MiddlewareFunc
+type Func func(Handle) Handle
+type MidCollect []Func
 
 // Add add the new middleware.
 // Newly added middleware will
 // to be in the top level chain.
-func (c MidCollect) Add(next MiddlewareFunc) MidCollect {
-	c = append(c, next)
-
-	return c
+func (c MidCollect) Add(next Func) MidCollect {
+	return append(c, next)
 }
 
 // Wrap wrap the handler in a chain
