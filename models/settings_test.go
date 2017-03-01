@@ -8,10 +8,7 @@ import (
 )
 
 func TestLoadSettings(t *testing.T) {
-	models.Set = nil
-
 	Convey("Load settings from test", t, func() {
-		So(models.Set, ShouldBeNil)
 		err := models.LoadSettings("./settings_test.yml")
 		So(err, ShouldBeNil)
 
@@ -25,10 +22,7 @@ func TestLoadSettings(t *testing.T) {
 }
 
 func TestRouterSetting(t *testing.T) {
-	models.Set = nil
-
 	Convey("Test valid parse setting file", t, func() {
-		So(models.Set, ShouldBeNil)
 		err := models.LoadSettings("./omitempty_settings_test.yml")
 		So(err, ShouldBeNil)
 
@@ -44,10 +38,7 @@ func TestRouterSetting(t *testing.T) {
 }
 
 func TestSslSetting(t *testing.T) {
-	models.Set = nil
-
 	Convey("Test valid parse setting file", t, func() {
-		So(models.Set, ShouldBeNil)
 		err := models.LoadSettings("./settings_test.yml")
 		So(err, ShouldBeNil)
 
@@ -59,10 +50,7 @@ func TestSslSetting(t *testing.T) {
 }
 
 func TestDatabaseSetting(t *testing.T) {
-	models.Set = nil
-
 	Convey("Test valid parse setting file", t, func() {
-		So(models.Set, ShouldBeNil)
 		err := models.LoadSettings("./settings_test.yml")
 		So(err, ShouldBeNil)
 
@@ -72,23 +60,5 @@ func TestDatabaseSetting(t *testing.T) {
 			So(models.Set.Database.TokenTable, ShouldEqual, "tokentable")
 			So(models.Set.Database.UserTable, ShouldEqual, "usertable")
 		})
-	})
-}
-
-func TestOmitLoadSetting(t *testing.T) {
-	models.Set = nil
-
-	Convey("Load settings with empty fields", t, func() {
-		So(models.Set, ShouldBeNil)
-		err := models.LoadSettings("./omitempty_settings_test.yml")
-		So(err, ShouldBeNil)
-
-		Convey("Check all field must be empty", func() {
-			So(models.Set.Timber.Token, ShouldEqual, "")
-			So(models.Set.Timber.Host, ShouldEqual, "")
-			So(models.Set.Ssl.Certificate, ShouldEqual, "")
-			So(models.Set.Ssl.Key, ShouldEqual, "")
-		})
-
 	})
 }
