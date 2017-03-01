@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"log"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/herald-it/goncord/utils/pwd_hash"
 	"gopkg.in/mgo.v2"
@@ -26,7 +28,11 @@ func (u User) String() string {
 }
 
 func (u *User) SetPassword(password string) {
+	log.Println("---------------------------------------------")
+	log.Println(password)
 	u.Password = pwd_hash.HashPassword(password)
+	log.Println(u.Password)
+	log.Println("---------------------------------------------")
 }
 
 // NewToken creates a new token using private key.
