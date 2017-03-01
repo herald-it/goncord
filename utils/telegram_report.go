@@ -16,6 +16,14 @@ type ErrorReport struct {
 }
 
 func TelegramReport(err interface{}) {
+	if models.Set.Timber.Host == "" {
+		return
+	}
+
+	if models.Set.Timber.Token == "" {
+		log.Println("Timber token empty.")
+	}
+
 	go func() {
 		yamlMessage, err := yaml.Marshal(err)
 
