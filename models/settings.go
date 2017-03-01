@@ -47,7 +47,7 @@ type Setting struct {
 }
 
 // Set the set of loaded settings.
-var Set *Setting
+var Set Setting
 
 // LoadSettings loads the settings from a file.
 func LoadSettings(path string) error {
