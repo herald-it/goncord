@@ -10,11 +10,12 @@ import (
 
 	"net/http"
 
+	"runtime/debug"
+	"time"
+
 	"github.com/herald-it/goncord/middleware"
 	. "github.com/julienschmidt/httprouter"
 	"gopkg.in/mgo.v2"
-	"time"
-	"runtime/debug"
 )
 
 var (
@@ -41,8 +42,10 @@ func init() {
 
 func main() {
 	defer func() {
+		time.Sleep(5000)
+
 		if r := recover(); r != nil {
-			TelegramReport(struct{
+			TelegramReport(struct {
 				Error string `yaml:"error"`
 				Stack string `yaml:"stack"`
 			}{
@@ -52,7 +55,6 @@ func main() {
 
 			log.Println(r.(error).Error())
 			log.Println("Wait 5 second...")
-			time.Sleep(5000)
 			main()
 		}
 	}()
