@@ -74,7 +74,7 @@ func (uc UserController) LoginUser(
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 	}
 
-	usr := new(models.User)
+	usr := models.User{}
 	if err := Fill(usr, r.PostForm, "login|email", "password"); err != nil {
 		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
@@ -135,8 +135,8 @@ func (uc UserController) RegisterUser(
 		return &HttpError{Error: err, Message: "Post form can not be parsed.", Code: 500}
 	}
 
-	usr := new(models.User)
-	if err := Fill(usr, r.PostForm, "login", "email", "password"); err != nil {
+	usr := models.User{}
+	if err := Fill(&usr, r.PostForm, "login", "email", "password"); err != nil {
 		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
 
@@ -146,21 +146,17 @@ func (uc UserController) RegisterUser(
 
 	usr.SetPassword(usr.Password)
 
-	log.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-	log.Println(usr.Password)
-	log.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	isUserExist := querying.IsExistUserByLoginOrEmail(
+		usr.Login, usr.Email, collect,
+	)
 
-	isUserExist, err := querying.IsExistUser(usr, collect)
-	if err != nil {
-		return &HttpError{Error: err, Message: "Error check user exist.", Code: 500}
-	}
 	if isUserExist {
 		return &HttpError{Error: nil, Message: "User already exist.", Code: 500}
 	}
 
 	collect.Insert(&usr)
 
-	usr.Password = usr.Password + "..."
+	usr.Password = usr.Password[:5] + "..."
 	log.Println("User added: ", usr)
 	return nil
 }
