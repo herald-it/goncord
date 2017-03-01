@@ -30,9 +30,24 @@ func FindUserID(obj *User, c *mgo.Collection) (*User, error) {
 	return &results[0], nil
 }
 
+func IsExistUserByLoginOrEmail(login, email string, c *mgo.Collection) bool {
+	count, err := c.Find(M{
+		"$or": []M{
+			{"login": login},
+			{"email": email},
+		},
+	}).Count()
+
+	if err != nil {
+		panic(err)
+	}
+
+	return count != 0
+}
+
 // FindUser searches for the user in the collection.
 // If found more than 1 user returns an error.
-func FindUser(obj *User, c *mgo.Collection) (*User, error) {
+func FindUser(obj User, c *mgo.Collection) (*User, error) {
 	var results []User
 
 	err := c.Find(
