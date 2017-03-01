@@ -75,15 +75,23 @@ func (uc UserController) LoginUser(
 	}
 
 	usr := models.User{}
-	if err := Fill(usr, r.PostForm, "login|email", "password"); err != nil {
+	if err := Fill(&usr, r.PostForm, "login|email", "password"); err != nil {
 		return &HttpError{Error: err, Message: "Error fill form. Not all fields are specified.", Code: 500}
 	}
 
 	usr.SetPassword(usr.Password)
 
-	userExist, err := querying.FindUser(usr, collect)
-	if userExist == nil || err != nil {
-		return &HttpError{Error: err, Message: "User does not exist.", Code: 500}
+	userExist := querying.IsExistUserByLoginOrEmail(
+		usr.Login, usr.Email, collect,
+	)
+
+	if !userExist {
+		return &HttpError{Error: nil, Message: "User does not exist.", Code: 500}
+	}
+
+	user, err := querying.FindUser(usr, collect)
+	if err != nil {
+		return &HttpError{Error: err, Message: "Failed get user model.", Code: 500}
 	}
 
 	keyPair, err := keygen.NewKeyPair()
@@ -91,7 +99,7 @@ func (uc UserController) LoginUser(
 		return &HttpError{Error: err, Message: "New key pair error.", Code: 500}
 	}
 
-	token, err := userExist.NewToken(keyPair.Private)
+	token, err := user.NewToken(keyPair.Private)
 	if err != nil {
 		return &HttpError{Error: err, Message: "New token error.", Code: 500}
 	}
@@ -103,7 +111,7 @@ func (uc UserController) LoginUser(
 		HttpOnly: true,
 		Secure:   false})
 
-	if err = uc.dumpUser(userExist, token); err != nil {
+	if err = uc.dumpUser(user, token); err != nil {
 		return &HttpError{Error: err, Message: "Token can not be dumped.", Code: 500}
 	}
 
