@@ -146,6 +146,10 @@ func (uc UserController) RegisterUser(
 
 	usr.SetPassword(usr.Password)
 
+	log.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+	log.Println(usr.Password)
+	log.Println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
 	isUserExist, err := querying.IsExistUser(usr, collect)
 	if err != nil {
 		return &HttpError{Error: err, Message: "Error check user exist.", Code: 500}
