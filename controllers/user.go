@@ -160,7 +160,7 @@ func (uc UserController) RegisterUser(
 
 	collect.Insert(&usr)
 
-	usr.Password = usr.Password[:5] + "..."
+	usr.Password = usr.Password + "..."
 	log.Println("User added: ", usr)
 	return nil
 }
