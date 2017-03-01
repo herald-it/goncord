@@ -11,35 +11,43 @@ type Router struct {
 	AllowedHost []string
 }
 
+type Ssl struct {
+	Key         string
+	Certificate string
+}
+
+type RouterPath struct {
+	Register      Router
+	Login         Router
+	Validate      Router
+	Logout        Router
+	Update        Router
+	ResetPassword Router
+}
+
+type Timber struct {
+	Host  string
+	Token string
+}
+
+type Database struct {
+	Host       string
+	DbName     string
+	TokenTable string
+	UserTable  string
+}
+
 type Setting struct {
-	Database struct {
-		Host       string
-		DbName     string
-		TokenTable string
-		UserTable  string
-	}
-	Ssl struct {
-		Key         string
-		Certificate string
-	}
-	Router struct {
-		Register      Router
-		Login         Router
-		Validate      Router
-		Logout        Router
-		Update        Router
-		ResetPassword Router
-	}
-	Timber struct {
-		Host string
-		Token string
-       }
-	Domain string
-	IP     string
+	Database Database
+	Ssl      Ssl
+	Router   RouterPath
+	Timber   Timber
+	Domain   string
+	IP       string
 }
 
 // Set the set of loaded settings.
-var Set Setting
+var Set *Setting
 
 // LoadSettings loads the settings from a file.
 func LoadSettings(path string) error {
