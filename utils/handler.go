@@ -34,7 +34,7 @@ func ErrWrap(eh ErrHandler) Handle {
 				http.Error(writer, e.Message, e.Code)
 			}
 		} else {
-			log.Printf("\033[7m\033[1m\t ✓ Successfully.\033[0m")
+			log.Print("\033[7m\033[1m\t ✓ Successfully.\033[0m")
 
 			if successURL := request.URL.Query().Get("success"); successURL != "" {
 				http.Redirect(writer, request, successURL, 301)
