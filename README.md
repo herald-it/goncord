@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/herald-it/goncord.svg?branch=master)](https://travis-ci.org/herald-it/goncord)
-
-
 goncord
 -------
 
@@ -36,6 +33,16 @@ ip: 0.0.0.0:8000
 ```
 Секция `ssl` не является обязательной.
 
+Для каждого роута можно настроить доступ только определенного круга лиц.
+Например:
+```yaml
+router:
+  register:
+    path: /register
+    allowedhost:
+      - localhost
+      - 192.168.0.2
+```
 #Аргументы запросов
 > \* помечены обязательные поля.
 -------
