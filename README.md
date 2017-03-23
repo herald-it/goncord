@@ -81,7 +81,7 @@ router:
 user: {"payload":"{'foo': 'bar'}"}
 ```
 
-##Reset password - [POST]
+## Reset password - [POST]
 Сброс пароля.
 
 `new_password*` - новый пароль.
